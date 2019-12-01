@@ -148,12 +148,25 @@ module Basics = struct (* datatypes, pattern maching, and HOFs *)
      Rank: *
    *)
 
+  (* Implement the function
+     combine : 'a list -> 'b list -> ('a * 'b) list
+     which pairs up the elements of the input lists.
+     Assume that the input lists have the same length.
+
+     Implement this as a recursive function.
+     Rank: *
+   *)
+  let combine l1 l2 = assert false
+
   (* The OCaml List module defines
-     List.map2 : ('a -> 'b -> 'c) -> 'a list -> 'b list -> c 'list
+     List.map2 : ('a -> 'b -> 'c) -> 'a mylist -> 'b mylist -> 'c mylist
 
      Implement
      map2 : ('a -> 'b -> 'c) -> 'a list -> 'b list -> 'c list
-     using `map`.
+     using `combine` and `map`
+     such that
+     map2 f [x1;x2;...] [y1;y2;...] = [f x1 y1; f x2 y2; ...]
+
      Assume the input lists have the same length (no need to check
      this).
 
