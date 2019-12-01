@@ -8,7 +8,7 @@ let rec append l1 l2 = match l1 with
 | Nil -> l2
 | Cons(x,xs) -> Cons(x, (append xs l2))
 
-let rec map f l = 
+let rec map f l = match l with
 | Nil -> Nil
 | Cons(x,xs) -> let r = f x in Cons(r, (map f xs))
 
