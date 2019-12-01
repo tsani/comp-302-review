@@ -29,8 +29,3 @@ let rec fold_left f acc l = match l with
 
 let rec rev l = 
   fold_left (fun acc x-> Cons(x,acc)) Nil l
-
-let fold_left' f acc l = 
-  let reverse l
-  fold_right (fun a b -> f b a) acc (rev l)
-  (* fun a b -> f b a switches accumulator and element *)
