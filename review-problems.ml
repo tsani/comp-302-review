@@ -1,22 +1,44 @@
-(* This is the master list of practice problems, by looking at
-   everything done in class, and thinking of potential extensions to
-   class problems.
-   
+(* Author: Jacob Thomas Errington
+
+   This is the master list of practice problems.
+   I made it by looking at everything done in class, and thinking of
+   potential extensions to class problems.
+
+   DO THESE PROBLEMS ON PAPER.
+   Do not use LearnOCaml!
+
+   On the exam, you do not have a compiler to check your types, and you
+   will lose marks for type errors, bad syntax, etc.
+
+   Of course, to *check* your work, you can type up your solution in
+   LearnOCaml and test it. Better yet, compare your solution with a
+   classmate and learn from each other!
+
    Each problem has a ranking with stars.
    - Problems ranked 1 or 2 stars, you should be able to do.
    - Problems ranked 3 or more stars are challenging, and probably
      beyond what you would see on a test.
 
-  DO THESE PROBLEMS ON PAPER.
-  Do not use LearnOCaml!
+   It's probably a good idea to at least *attempt* 3-star problems,
+   even if you don't feel super comfortable with the material, because
+   they will hopefully push the boundaries of your knowledge. But
+   don't feel bad if you can't solve them without hints from your
+   friends.
 
-  On the exam, you do not have a compiler to check your types, and you
-  will lose marks for type errors, bad syntax, etc.
+   One more remark about the stars: they don't reflect overall
+   difficulty of the question. They reflect the difficulty of the
+   question among that *type* of question.
+   For example, there are 1-star continuation questions as well as
+   1-star ordinary recursion questions.
+   They are not equally difficult!
+   The continuation question may be harder than the recursion
+   question, but _for a continuation question_ it's 1-star.
 
-  Problems for each topic are in their own module.
+   Problems for each topic are in their own module.
  *)
 
-module Basics = struct (* datatypes, pattern maching, and HOFs *)
+(* datatypes, pattern maching, and HOFs, continuations *)
+module Functions = struct
 
   (* Define our own list type.  Now we will implement many functions
      on lists using our own type, in order to familiarize ourselves with
@@ -123,6 +145,7 @@ module Basics = struct (* datatypes, pattern maching, and HOFs *)
   (* fold_left' : ('b -> 'a -> 'b) -> 'b -> 'a mylist -> 'b *)
   (* Implement fold_left' in terms of fold_right, without using
      recursion or pattern matching at all.
+     Note: reversing the list doesn't help.
      
      Rank: ***
    *)
@@ -299,7 +322,436 @@ module Basics = struct (* datatypes, pattern maching, and HOFs *)
 
      After proving the generalized theorem, prove the original theorem
      in 1 or two lines by invoking the generalized theorem.
+
+     Rank: **
    *)
+
+  (* You'll notice that the only think *specific* to addition that we
+     needed in the previous theorem was associativity. This suggests a
+     natural generalization of the previous theorem.
+
+     THEOREM.
+     Suppose f : 'a -> 'a -> 'a is an associative function, i.e.
+     for any x, y, z of type 'a, we have f (f x y) z = f x (f y z)
+     (For example, (+) is such a function.)
+     Suppose further that e : 'a is an identity of f, i.e.
+     for all x : 'a, f e x = f x e = x.
+     (For example, 0 is an identity of (+).)
+     Then, for any l : 'a list, we have
+     fold_right f l e = fold_left f e l
+
+     You can't prove this theorem directly; it must be generalized.
+     It is generalized in a similar way to the previous theorem, so
+     try to work out the generalization yourself.
+     If you get stuck, take a look at the induction practice problem
+     set posted for Midterm 1. It has this problem on it, and a
+     solution for it.
+   *)
+
+  (* Enough with folds. Let's see some other examples of things we can
+     do with lists. *)
+
+  (* Also from this point onwards, feel free to use 'a mylist or plain
+     'a list. *)
+
+  (* pairs : 'a list -> ('a * 'a) list
+     pairs l makes a list of all successive pairs of elements in l;
+     that is, it groups the elements two-by-two.
+
+     e.g.
+     pairs [x1, x2, x3, x4, x5]
+     = [(x1, x2); (x2, x3); (x3, x4); (x4; x5)]
+
+     Notice that there is one fewer element in the output than in the
+     input.
+
+     Implement this function using plain pattern matching and
+     recursion.
+
+     Rank: *
+   *)
+  let pairs l = assert false
+
+  (* Your previous implementation was almost certainly not tail
+     recursive, so let's rewrite it tail-recursively using continuations.
+
+     pairs_k : 'a list -> (('a * 'a) list -> 'r) -> 'r
+
+     Rank: **
+   *)
+  let pairs_k l k = assert false
+
+  (* I know I said no more folds, but I can't help myself.
+
+     A _scan_ is a variant of a fold that collects all the
+     intermediate results into a list. Many algorithms can be
+     elegantly expressed as a scan.
+
+     scan_left : ('b -> 'a -> 'b) -> 'b -> 'a list -> 'b list
+
+     For example,
+     scan_left (+) 0 [1;2;3;4;5]
+     = [1; 3; 6; 10; 15]
+     calculates the list of all the partial sums, from left to right.
+
+     In general,
+     scan_left f e [x1;x2;...]
+     = [f e x1; f (f e x1) x2; f (f (f e x1) x2) x3; ...]
+   *)
+  let scan_left f acc l = assert false
+
+  (* Okay, now that's enough with lists. *)
+  (* Next topic: math *)
+  type exp =
+    | Var of string  (* a variable, e.g. Var "x" *)
+    | Lit of float (* a constant, e.g. Lit 3.0 *)
+    | Plus of exp * exp (* a sum, i.e. e1 + e2 *)
+    | Times of exp * exp (* a product, i.e. e1 * e2 *)
+    | Exp of exp (* exponential: exp(e) *)
+    | Ln of exp (* natural log: ln(e) *)
+
+  (* There are some things missing in our exp datatype
+     but that's because they can be expressed in terms of things we
+     already have. *)
+
+  (* For instance, we don't have general exponentiation.
+     We only have exponentiation with base e.
+     However, notice:
+     b = exp (ln b) since e and ln are inverses.
+     Therefore, b^x = (exp (ln b))^x
+     which rewritten = exp (x * ln b)
+     and this can be expressed using the syntax tree we have defined.
+
+     Implement the function
+     exp_base : exp -> exp -> exp
+     such that
+     exp_base b x represents b^x by expressing it using the exp syntax
+     tree as exp (x * ln b)
+
+     Rank: *
+   *)
+  let exp_base b x = assert false
+
+  (* Use exp_base to construct the reciprocal.
+
+     Implement the function
+     recip : exp -> exp
+     such that
+     recip e computes 1/e
+
+     (Recall: 1/e = e^-1)
+   *)
+  let recip e = assert false
+
+  (* Computationally, it's inefficient to detour through
+     the exponential and ln for integer powers.
+     Instead, for integer powers, we can just use repeated
+     multiplication.
+
+     Implement the function
+     pow : exp -> k -> exp
+     such that
+     pow e k computes e * e * e * ... * e (k times)
+
+     Rank: *
+   *)
+  let pow e k = assert false
+
+  (* Polynomials are an important class of functions.
+     We would like a convenience function for constructing polynomials
+     given just a list of coefficients.
+
+     Implement the function
+     poly : string -> float list -> exp
+     such that
+     poly x [c0;c1;c2; ...; cn]
+     constructs the polynomial
+     c0 * x^0 + c1 * x^1 + c2 * x^2 + ... + cn * x^n
+
+     Rank: **
+   *)
+  let poly x cs = assert false
+
+  (* We would like to evaluate an expression.
+
+     Assuming that an expression contains no variables, this amounts
+     to just performing all the necessary calculations.
+
+     Implement the function
+     eval : exp -> float
+     which evaluates a given expression which is _assumed_ to contain
+     no variables. So if you encounter a variable in the expression,
+     you may crash in your favourite way, e.g. failwith "oh no" or
+     assert false.
+
+     By the way, to implement the cases for Exp and Ln, you may want
+     to use respectively the built-in functions
+     - exp : float -> float
+     - log : float -> float
+
+     Rank: *
+   *)
+  let eval e = assert false
+
+  (* Sadly, not all expressions are free of variables!
+
+     Implement the function
+     subst : string * exp -> exp -> exp
+     such that
+     subst (x, e') e
+     replaces all occurrences of the variable x in the expression e
+     with e'.
+
+     By the way, this is significantly simpler than substitution in
+     MiniCaml since our language of expressions contains no binders!
+     (So variable capture is impossible.)
+
+     Rank: *
+   *)
+  let subst (x, e') e = assert false
+
+  (* Implement the function
+     eval_at : string * float -> exp -> float
+     such that
+     eval_at (x, a) e
+     performs the substitution (x, Lit a) on e, and then evaluates the
+     result.
+
+     Assume that e has only one variable, and that the substitution s
+     does not introduce any new variables.
+
+     Rank: zero stars
+   *)
+  let eval_at = assert false
+
+  (* Differentiation is a technique from calculus allowing us to
+     determine the slope the tangent line of a given curve at a given
+     point.
+
+     I will write `Dx e` to denote "the derivative of expression e
+     with respect to x".
+
+     It is defined by the following rules:
+     Dx x = 1                         -- derivative of the target variable is 1
+     Dx y = 0                         -- derivative of other variables is 0
+     Dx c = 0                         -- derivative of a constant is 0
+     Dx (e1 + e2) = Dx e1 + Dx e2     -- linearity of differentiation
+     Dx (e1 * e2)
+        = e1 * (Dx e2) + (Dx e1) * e2 -- the product rule
+     Dx exp(e) = exp(e) * Dx e        -- exponential + chain rule
+     Dx ln(e) = (1/e) * Dx e          -- natural log + chain rule
+
+     Implement the function
+     deriv : string -> exp -> exp
+     such that
+     deriv x e computes the derivative of e with respect to x
+
+     Hint: for the Ln case, you should use the recip function you
+     already implemented.
+
+     Rank: **
+   *)
+  let deriv x e = assert false
+
+  (* The Newton-Raphson method is a technique for finding the roots of
+     a given function.
+
+     We say that `a` is a root of the function `f` if f(a) = 0.
+
+     In this problem, we represent functions as expressions involving
+     a variable x.
+
+     The NR method begins with an initial guess x0 and produces a
+     refinement of the guess, x1. This refinement is then used as the
+     next guess, and so on, until we reach a guess x' such that f(x')
+     is sufficiently close to zero.
+     Consider f(x') to be sufficiently close if it is within 0.001 of
+     zero.
+
+     Concretely, the next guess x_(i+1) is calculated from this
+     equation:
+
+     x_(i+1) = x_i - (f(x_i) / f'(x_i))
+
+     Where f' denotes the derivative of f with respect to x.
+
+     Implement the function
+     nr : float -> exp -> float
+     such that
+     nr x0 e = a
+     computes a root `a` of the function expressed by `e` given an
+     initial guess x0.
+
+     Hint:
+     Notice in the description of the problem, we need the derivative
+     of f as well as f itself. To obtain the derivative, use `deriv`.
+     To evaluate f and f' at specific points, use `eval_at`.
+
+     Rank: **
+   *)
+  let nr x0 e = assert false
+
+  (* Are you tired of calculus? I'm tired of calculus.
+     Let's talk about code generation / partial evaluation. *)
+
+  (* The canonical example: pow
+
+     We can calculate n^k using a simple recursive program.
+   *)
+  let pow k n =
+    if k = 0 then 1
+    else pow (k-1) n * n
+
+  (* Rewrite this function so it performs partial evaluation.
+
+     That is, implement the function
+     pow_gen : int -> int -> int
+     such that
+     pow_gen k computes a NON-RECURSIVE function f
+     such that
+     f n computes n^k
+
+     In other words, the function f that is returned must not contain
+     a recursive call to pow_gen.
+     By the way, this rules out the putative answer
+     pow_gen k = pow k
+     by just partially applying pow !
+
+     Rank: *
+   *)
+  let pow_gen k = assert false
+
+  (* Back to lists!
+
+     Long ago, at the top of this file, you implemented append, for
+     the mylist type. Notice in that implementation that the second
+     list is only needed at the very end.
+     This suggests that we can use partial evaluation to construct a
+     non-recursive function that just waits for the second list.
+
+     Implement the function
+     app_gen : 'a list -> 'a list -> 'a list
+     such that
+     app_gen l1 computes a non-recursive function f
+     such that
+     f l2 computes the concatenation of l1 and l2.
+
+     Rank: *
+   *)
+  let app_gen l1 = assert false
+
+  (* In the section on math, you implemented the function
+     `subst` which replaces all occurrences of a specified variable
+     with a given expression.
+
+     An important thing to notice about that function is that the
+     given expression to plug in is only needed when the appropriate
+     Var node is encountered.
+     This suggests you can use partial evaluation to construct a
+     non-recursive function that waits for this expression later.
+
+     Implement the function
+     subst_gen : string -> exp -> exp
+     such that
+     subst_gen x e computes a non-recursive function f such that
+     f e' computes the same answer as subst (x, e') e
+
+     (Sadly, the parameters have to be switched around here to make it
+     work.)
+
+     Rank: ***
+   *)
+  let subst_gen x e = assert false
+
+  (* In this problem, we consider partially evaluated polynomials.
+
+     Implement a function
+     poly_gen : int list -> int -> int
+     such that
+     poly_gen [c0;c1;...;cn] computes a non-recursive function f
+     equivalent to
+     fun x -> c0 * x^0 + c1 * x^1 + ... + cn * x^n
+     crucially, the constructed function f does not contain any
+     recursive call to poly_gen.
+
+     To calculate x^k, you should use pow k x.
+
+     Rank: **
+   *)
+  let poly_gen cs = assert false
+
+  (* Consider a type of binary tree. *)
+  type 'a tree =
+    | Empty
+    | Node of 'a tree * 'a * 'a tree
+
+  type 'a bst = (int * 'a) tree
+
+  (* In this problem, we consider a binary SEARCH tree, so the
+     elements are ordered.
+     That is, for any tree t = Node (l, (k, v), r)
+     we have that every key k' in l is LESS THAN (or equal) k
+     and every key k' in r in GREATER THAN (or equal) k.
+
+     First, implement the function
+     insert : 'a bst -> int -> 'a -> 'a bst
+     such that
+     insert t k v
+     inserts the value v with the key k in the BST t.
+     This should overwrite any previous value associated with k in the BST.
+
+     Rank: *
+   *)
+  let insert t k v = assert false
+
+  (* Is your implementation of insert tail recursive?
+     Explain by giving the definition of a tail recursive function.
+
+     Rank: *
+   *)
+
+  (* Now we wish to implement the opposite operation.
+     Implement the function
+     lookup : 'a bst -> int -> 'a option
+     such that
+     lookup t k
+     looks up a key k in the binary search tree t, returning its
+     associated value. The function should return None in case it
+     can't find the given entry.
+
+     Rank: *
+   *)
+  let lookup t k = assert false
+
+  (* Prove, using induction, the following theorem.
+
+     For any t : 'a bst, k : int, v : 'a, we have
+     lookup (insert t k v) k = Some v
+
+     HINT:
+     In the step case, you will need to consider subcases for whether
+     k is less than, equal to, or greater than the key being
+     considered in this node.
+
+     I did this problem in class, so you can refer to your class notes
+     if you get stuck.
+
+     Rank: ***
+   *)
+
+  (* Notice, in your implementation of insert, you did not need the
+     *value* to insert until the very end.
+     Once again, we can use partial evaluation.
+
+     Implement the function
+     insert_gen : 'a bst -> int -> 'a -> 'a bst
+     such that
+     insert_gen t k computes a non-recursive function f
+     such that f v inserts v associated to k into the tree t.
+
+     Rank: **
+   *)
+  let insert_gen t k = assert false
 end
 
 module Induction = struct
