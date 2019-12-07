@@ -133,7 +133,7 @@ module Functions = struct
   (* fold_left : ('b -> 'a -> 'b) -> 'b -> 'a mylist -> 'b *)
   (* First, implement fold_left using recursion and pattern
      matching.
-     
+
      Rank: *
    *)
   let fold_left f e l = assert false
@@ -146,7 +146,7 @@ module Functions = struct
   (* Implement fold_left' in terms of fold_right, without using
      recursion or pattern matching at all.
      Note: reversing the list doesn't help.
-     
+
      Rank: ***
    *)
   let fold_left' f e l = assert false
@@ -157,7 +157,7 @@ module Functions = struct
   (* map' : ('a -> 'b) -> 'a mylist -> 'b mylist *)
   (* Implement map' using fold_right so that it does the same thing as
      map.
-     
+
      Rank: **
    *)
   let map' f l = assert false
@@ -193,8 +193,6 @@ module Functions = struct
      Assume the input lists have the same length (no need to check
      this).
 
-     Hint: you can use `map` twice!
-
      Rank: ***
    *)
   let map2 f l1 l2 = assert false
@@ -210,7 +208,7 @@ module Functions = struct
 
      Rank: **** (if you use rev, too)
      Rank: ***** (if you only use fold_right; no other recursive list functions allowed!)
-     
+
      Hint for if you only allow using fold_right:
      use the fold to build up a *function* that ultimately acceps l2 as an input.
    *)
@@ -297,11 +295,11 @@ module Functions = struct
        2. not (a && b) = not a || not b
 
      Rank: **
-   *) 
+   *)
 
   (* sum : int mylist -> int *)
   (* Adds up all the elements of a list.
-  
+
      Implement this function in terms of fold_right.
 
      Rank: *
@@ -754,5 +752,166 @@ module Functions = struct
   let insert_gen t k = assert false
 end
 
-module Induction = struct
+module Lazy = struct
+  type 'a susp = Susp of (unit -> 'a)
+  let delay f = Susp f
+  let force f = f ()
+
+  (* Usual definition of streams. *)
+  type 'a str =
+    { hd : 'a
+    ; tl : 'a str susp
+    }
+
+  (** Implement the function
+      nth : int -> 'a str -> 'a
+      such that
+      nth n s computes the nth element of the stream s.
+
+      Rank: *
+   *)
+  let nth n s = assert false
+
+  (** The fibonacci sequence is defined as
+      fib 0 = 0
+      fib 1 = 1
+      fib n = fib (n-1) + fib (n-2)
+
+      Rewriting the last equation by shifting n gives:
+      fib (n+2) = fib (n+1) + fib n
+
+      Construct the stream `fib` of all fibonacci numbers.
+
+      Rank: **
+
+      There is a "fancy" way to do this, like I tried in class, using
+      higher-order functions on streams.
+
+      HINT: There is also a more "pedestrian" way.
+      Use a helper function to calculate, given fib n and fib (n+1),
+      the fibonacci sequence starting from fib (n+2).
+   *)
+  let fib : int str = assert false
+
+  (** In mathematics, a sequence is defined as a function from the
+      natural numbers to some other set. That is, for each natural
+      number `n`, there is an element of the sequence a_n.
+
+      Define the function
+      seq : (int -> 'a) -> 'a str
+      such that given f : int -> 'a
+      (which represents a mathematical sequence)
+      seq f computes the stream
+      f 0; f 1; f 2; ...
+
+      Rank: *
+   *)
+  let seq f = assert false
+
+  (** The Wallis product, published in 1656, is an infinite product
+      whose limit is pi/2. It is among the oldest known ways to
+      calculate pi to arbitrary precision.
+
+      It is defined as:
+      (2/1 * 2/3) * (4/3 * 4/5) * (6/5 * 6/7) * (8/7 * 8/9) * ...
+
+      Notice that the nth factor in the product is given by the
+      formula:
+
+      a_n = 2n/(2n-1) * 2n/(2n+1)
+          = 4n^2/(4n^2 - 1)
+      (Remark: this sequence begins at n=1 !)
+
+      Denote by W_n the Wallis product truncated at factor n.
+      So W_1 = a_1 = 2/1 * 2/3
+      W_2 = a_2 * W_1
+      W_3 = a_3 * W_2 = a_3 * a_2 * a_1
+      and so on.
+
+      https://en.wikipedia.org/wiki/Wallis_product
+   *)
+
+  (** Write a recursive function
+      f : int -> float
+      such that
+      f n computes W_n.
+
+      Then, use `seq f` to obtain the sequence of all approximations
+      to the Wallis product.
+
+      HINTS:
+      - You will need to use float_of_int to make this work.
+      - Since the wallis product starts at n=1, you will need to do
+        some shifting to make it work with your `seq`, which begins
+        with `f 0`.
+
+      Rank: *
+   *)
+  let wallis_1 =
+    let rec f n =
+      assert false
+    in
+    assert false
+
+  (** This previous method is quite inefficient, since it recalculates
+      the same things over and over again, through the recursive
+      function `f`.
+
+      Recall:
+      a_n = 4n^2/(4n^2 - 1)
+      and
+      W_(n+1) = a_n * W_n
+
+      Using this, directly construct the stream
+
+      wallis_2 : float str
+
+      which contains all successive approximations of the Wallis
+      product.
+
+      Rank: **
+   *)
+  let wallis_2 = assert false
+
+  (** The super-Catalan numbers are a two-dimensional generalization
+      of the Catalan numbers.
+
+      We have this closed form equation in terms of factorials:
+
+                (2m)! (2n)!
+      C(m, n) = ------------
+                (m+n)! m! n!
+
+      Implement the function
+      superc : int -> int -> int
+      such that
+      superc m n = C(m, n)
+
+      Implement factorial recursively as a helper.
+      Recall
+      0! = 1
+      (n+1)! = n! * (n + 1)
+   *)
+  let superc m n = assert false
+
+  (** An infinite two-dimensional grid of integers can be modelled
+      with the type `int str str`.
+      We can think of this as an infinite stream of infinite columns.
+
+      Using superc, construct the infinite grid of super-Catalan
+      numbers
+      supercatalan : int str str
+      such that
+      nth m (nth n supercatalan) = superc m n = C(m, n)
+
+      Hint: First solve the subproblem of calculating, for some fixed
+      k, the stream
+      column : int str
+      such that
+      nth m column = superc m k
+      Then, generalize this to generate the sequence of all the columns.
+
+      Rank: **
+   *)
+  let supercatalan = assert false
 end
