@@ -755,7 +755,7 @@ end
 module Lazy = struct
   type 'a susp = Susp of (unit -> 'a)
   let delay f = Susp f
-  let force f = f ()
+  let force (Susp f) = f ()
 
   (* Usual definition of streams. *)
   type 'a str =
