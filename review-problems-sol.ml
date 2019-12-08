@@ -38,9 +38,6 @@ let rec fold_right f l acc = match l with
   | Nil -> acc
   | Cons(x,xs) -> f x (fold_right f xs acc)
 
-let fold_left' f e l = 
-	fold_right (fun a b -> f b a) (fold_right (fun a b -> append b (Cons(a, Nil))) l Nil)
-
 let map' f l = 
   	fold_right (fun x acc -> Cons(f x, acc)) l Nil
 
