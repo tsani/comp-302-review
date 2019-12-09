@@ -447,9 +447,11 @@ module Functions = struct
      multiplication.
 
      Implement the function
-     pow : exp -> k -> exp
+     pow : exp -> int -> exp
      such that
      pow e k computes e * e * e * ... * e (k times)
+
+     You can assume `k` is positive (no need to check this).
 
      Rank: *
    *)
