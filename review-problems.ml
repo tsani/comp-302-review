@@ -52,7 +52,9 @@ module Functions = struct
 
      Rank: *
    *)
-  let of_list l = assert false
+  let rec of_list l = match l with
+      [] -> Nil
+    |x :: xs -> Cons (x,of_list xs)
 
   (* append : 'a mylist -> 'a mylist -> 'a mylist
      Concatenate two lists together.
@@ -61,7 +63,9 @@ module Functions = struct
 
      Rank: *
    *)
-  let append l1 l2 = assert false
+  let rec append l1 l2 = match l1 with
+    |Cons (x,xs) -> Cons (x,append xs l2)
+    | Nil -> l2
 
   (* Prove, using induction, the following theorem.
 
@@ -85,7 +89,9 @@ module Functions = struct
 
      Rank: *
    *)
-  let map f l = assert false
+  let rec map f l = match l with
+     Nil -> Nil
+  | Cons (x,xs) -> Cons (f x ,map f xs)
 
   (* length : 'a mylist -> int
      Mimics the List.length function.
@@ -93,7 +99,9 @@ module Functions = struct
 
      Rank: *
    *)
-  let length l = assert false
+  let rec length l = match l with
+      Nil -> 0
+    |Cons (x,xs) -> 1+ (length xs)
 
   (* Prove, using induction, the following theorems.
 
@@ -115,18 +123,23 @@ module Functions = struct
 
      Rank: *
    *)
-  let fold_right f l e = assert false
+  let rec fold_right f l e = match l with
+      Cons (x,xs) -> f x (fold_right f xs e)
+    | Nil -> e
+  ;;
+
+  fold_right (fun x y -> y+.1.) (of_list [1;2;3]) 0.;;
 
   (* According to the description above, `fold_right f l e` takes a
      list
      l = `Cons (x1, (Cons (x2, Cons (x3, Nil))))` for example
      and computes
-     `f x1 (f x2 (f x2 e))`
+     `f x1 (f x2 (f x3 e))`
      Notice that the applications of `f` are nested to the _right_.
 
      What if we wanted the opposite nesting?
      f (f (f e x1) x2) x3
-
+ 
      This this is a left fold, instead of a right fold.
    *)
 
@@ -136,7 +149,9 @@ module Functions = struct
 
      Rank: *
    *)
-  let fold_left f e l = assert false
+  let rec fold_left f e l = match l with
+      Cons (x,xs) -> fold_left f (f e x) xs
+    |Nil -> e
 
   (* Theoretically, any recursive function you can write for lists
      can be implemented with fold_right, so in particular, one should
@@ -149,7 +164,7 @@ module Functions = struct
 
      Rank: ***
    *)
-  let fold_left' f e l = assert false
+  let fold_left' (f:'a->'b->'a) (e:'a) (l:'b mylist) = (fold_right (fun x y -> (fun z -> y (f z x))) l (fun w -> w)) e
 
   (* Now let's implement some other, less complicated higher-order
      functions using fold_right. *)
@@ -160,7 +175,7 @@ module Functions = struct
 
      Rank: **
    *)
-  let map' f l = assert false
+  let map' f l = fold_right (fun x y -> Cons ((f x), y)) l Nil
 
   (* Prove, using induction on lists, the following.
 
@@ -178,8 +193,13 @@ module Functions = struct
 
      Implement this as a recursive function.
      Rank: *
-   *)
-  let combine l1 l2 = assert false
+  *)
+  exception Invalid_argument of string
+  let rec combine l1 l2 = match l1, l2 with
+      Cons(x,xs),Cons(y,ys) -> Cons ((x,y),combine xs ys)
+    | Nil, Nil -> Nil
+    | _ -> raise (Invalid_argument "List length don't match")
+
 
   (* The OCaml List module defines
      List.map2 : ('a -> 'b -> 'c) -> 'a mylist -> 'b mylist -> 'c mylist
@@ -195,7 +215,11 @@ module Functions = struct
 
      Rank: ***
    *)
-  let map2 f l1 l2 = assert false
+  let map2 f l1 l2 =
+    let aux_l = combine l1 l2 in
+    let aux_f (x,y) = f x y in
+    map aux_f aux_l
+
 
   (* Can you implement map2' in terms of only one *single* call to
      fold_right?
@@ -212,8 +236,14 @@ module Functions = struct
      Hint for if you only allow using fold_right:
      use the fold to build up a *function* that ultimately acceps l2 as an input.
    *)
-  let map2' f l1 l2 =
-    assert false
+  let map2' f l1 l2 = (fold_right
+                         (fun x k -> fun z -> match z with
+                            | Cons (y,ys) , xs -> ys , Cons ((f x y), xs)
+                            |  _  ->  raise (Invalid_argument "List length don't match")
+                         )
+                         l1
+                         (fun w -> w)
+                      ) (l2,Nil)
 
   (* It's easy to implement reverse using fold_left.
      rev : 'a mylist -> 'a mylist
@@ -222,8 +252,7 @@ module Functions = struct
      Implement it using fold_left.
      Rank: **
    *)
-  let rev l =
-    assert false
+  let rev l = fold_left (fun x y -> Cons (y,x)) Nil l
 
   (* On the other hand it is much more challenging to do it in terms
      of fold_right.
@@ -232,7 +261,13 @@ module Functions = struct
 
      Implement it using fold_right.
      Rank: ****
-   *)
+  *)
+
+  let rev' l = (fold_right
+                  (fun x k -> fun z -> k (Cons (x,z) ))
+                  l
+                  (fun w -> w)
+               ) Nil
 
   (* for_all : ('a -> bool) -> 'a mylist -> bool *)
   (* `for_all p l` = true
@@ -247,7 +282,6 @@ module Functions = struct
      Rank: **
    *)
   let for_all p l = assert false
-
   (* exists : ('a -> bool) -> 'a mylist -> bool *)
   (* `exists p l` is true
      if and only if
@@ -847,11 +881,11 @@ module Lazy = struct
 
       Rank: *
    *)
-  let wallis_1 =
-    let rec f n =
-      assert false
-    in
-    assert false
+  (* let wallis_1 =
+   *   let rec f n =
+   *     assert false
+   *   in
+   *   assert false *)
 
   (** This previous method is quite inefficient, since it recalculates
       the same things over and over again, through the recursive
