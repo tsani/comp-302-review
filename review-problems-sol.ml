@@ -77,6 +77,12 @@ let rec fold_left f acc l = match l with
 let fold_left' f e l =
   fold_right (fun a b -> f b a) (fold_right (fun a b -> append b (Cons(a, Nil))) l Nil) e
 
+let rec scan_left (f : 'b -> 'a -> 'b) (acc : 'b) (l : 'a list) : 'b list =
+  acc ::
+    match l with
+    | [] -> []
+    | x :: xs -> scan_left f (f acc x) xs
+
 let rev l =
   fold_left (fun acc x-> Cons(x,acc)) Nil l
 
