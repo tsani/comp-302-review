@@ -34,7 +34,7 @@ let rec fold_left f acc l = match l with
   | Cons(x,xs) -> fold_left f (f acc x) xs
 
 let fold_left' f e l =
-  fold_right (fun a b -> f b a) (fold_right (fun a b -> append b (Cons(a, Nil))) l Nil)
+  fold_right (fun a b -> f b a) (fold_right (fun a b -> append b (Cons(a, Nil))) l Nil) e
 
 let rev l =
   fold_left (fun acc x-> Cons(x,acc)) Nil l
