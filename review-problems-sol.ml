@@ -49,10 +49,10 @@ let exists p l =
     fold_right (fun x acc -> acc || p x) l false
 
 let for_all' p l =
-   not (exists (fun x -> not p) l)
+   not (exists (fun x -> not (p x)) l)
 
 let exists' p l =
-    not (for_all (fun x -> not p) l)
+    not (for_all (fun x -> not (p x)) l)
 
 let sum l =
     fold_right (+) l 0
