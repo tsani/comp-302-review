@@ -12,6 +12,9 @@ let rec map f l =
 | Nil -> Nil
 | Cons(x,xs) -> let r = f x in Cons(r, (map f xs))
 
+let map2 f l1 l2 =
+  List.fold_right (fun x k -> fun (y :: ys) -> f x y :: k ys) l1 (fun [] -> []) l2
+
 let length l = 
    let rec length' acc = function
    | Nil -> acc
