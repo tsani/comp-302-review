@@ -110,8 +110,45 @@ let map2 f l1 l2 =
 let rec pairs l = match l with 
   | Nil -> Nil
   |Cons(x,Nil)-> Nil
-  |Cons(x,Cons(y,xs))-> Cons((x,y),pairs Cons(y,xs))
+  |Cons(x,Cons(y,xs))-> Cons((x,y),pairs Cons(y,xs))  
+  
+let exp_base b x = Exp(Times(b, Ln(x)))
+  
+let recip e = exp_base e Lit(-1.0)
+  
+let rec pow e k = match k with
+  |0-> Lit 1.0
+  |n-> Times(e,pow e (k-1))  
+    
+let rec eval e = match e with
+    | Var(_)-> failwith( ":(" )
+    | Lit(y)-> y
+    | Plus (x,y) -> (eval x) +. (eval y)
+    | Times (x,y) -> (eval x) *. (eval y)
+    | Exp (x) -> exp (eval x)
+    | Ln (x) -> log (eval x)  
 
+let rec subst (x, e') e = match e with
+  |Var(y)-> if x=y then e' else Var("y")
+  |Lit(y)-> Lit(y)
+  | Plus (y,z) -> Plus(subst (x,e') y, subst (x,e') z)
+  | Times (y,z) -> Times(subst (x,e') y, subst (x,e') z)
+  | Exp (y) -> Exp(subst (x,e') y)
+  | Ln (y) -> Ln(subst (x,e') y)
+  
+let eval_at (x,a) e = eval (subst (x,Lit a) e)
+
+let rec deriv x e = match e with 
+    | Var(y)-> if y=x then Lit(1.0) else Lit(0.0)
+    | Lit(y)-> Lit(0.0)
+    | Plus (y,z) -> Plus(deriv x y, deriv x z)
+    | Times (y,z) -> Times(deriv x y, deriv x z)
+    | Exp (y) -> Times(Exp(y), deriv x y)
+    | Ln (y) -> Times(recip y, deriv x y) 
+    
+let nr x0 e = x0-.(eval_at ("x", x0) e)/.(eval_at ("x", x0) (deriv "x" e))
+ 
+  
 (* Lazy Programming *)
 module Lazy = struct
   type 'a susp = Susp of (unit -> 'a)
