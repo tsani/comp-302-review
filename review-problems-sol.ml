@@ -121,6 +121,11 @@ let rec pairs l = match l with
   | Nil -> Nil
   |Cons(x,Nil)-> Nil
   |Cons(x,Cons(y,xs))-> Cons((x,y),pairs Cons(y,xs))
+  
+let rec pairs_k l k = match l with
+  | Nil -> k
+  | Cons (x, Nil) -> k
+  | Cons(x,Cons(y,xs)) -> pairs_k (Cons(y,xs)) (append k (Cons((x,y),Nil)))
 
 let rec pow k n =
   if k = 0 then 1
