@@ -598,7 +598,7 @@ module Functions = struct
 
      We can calculate n^k using a simple recursive program.
    *)
-  let pow k n =
+  let rec pow k n =
     if k = 0 then 1
     else pow (k-1) n * n
 
