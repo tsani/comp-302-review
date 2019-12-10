@@ -118,6 +118,39 @@ let rec pairs l = match l with
   |Cons(x,Nil)-> Nil
   |Cons(x,Cons(y,xs))-> Cons((x,y),pairs Cons(y,xs))
 
+let rec pow k n =
+  if k = 0 then 1
+  else pow (k-1) n * n
+
+let rec pow_gen k =
+  if k = 0 then
+    fun _ -> 1
+  else
+    let f = pow_gen (k-1) in
+    fun x -> x * f x
+
+let poly_gen cs =
+  let rec go i = function
+    | [] -> fun _ -> 0
+    | c :: cs ->
+       let f = go (i+1) cs in
+       fun x -> c * pow i x + f x
+  in
+  go 0 cs
+
+(* The above solution is a bit wasteful in that it calculates pow 0, pow 1,
+   pow 2, and so on.  This will take quadratic time.  We can improve this
+   by carrying a function instead of a counter. *)
+
+let poly_gen' cs =
+  let rec go pow = function
+    | [] -> fun _ -> 0
+    | c :: cs ->
+       let f = go (fun x -> x * pow x) cs in
+       fun x -> c * pow x + f x
+  in
+  go (fun _ -> 1) cs
+
 (* Lazy Programming *)
 module Lazy = struct
   type 'a susp = Susp of (unit -> 'a)
