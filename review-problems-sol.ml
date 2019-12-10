@@ -86,6 +86,10 @@ let rec scan_left (f : 'b -> 'a -> 'b) (acc : 'b) (l : 'a list) : 'b list =
 let rev l =
   fold_left (fun acc x-> Cons(x,acc)) Nil l
 
+(* It is very challenging to implement rev' in terms of *only* fold right.
+   This is a solution that also needs to call `append`, so it takes
+   quadratic time, and is not the best solution.
+ *)
 let rev' l =
   fold_right (fun a b -> append b (Cons(a, Nil))) l Nil
 
