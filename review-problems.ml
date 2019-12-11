@@ -598,7 +598,7 @@ module Functions = struct
 
      We can calculate n^k using a simple recursive program.
    *)
-  let pow k n =
+  let rec pow k n =
     if k = 0 then 1
     else pow (k-1) n * n
 
@@ -651,7 +651,7 @@ module Functions = struct
      non-recursive function that waits for this expression later.
 
      Implement the function
-     subst_gen : string -> exp -> exp
+     subst_gen : string -> exp -> exp -> exp
      such that
      subst_gen x e computes a non-recursive function f such that
      f e' computes the same answer as subst (x, e') e

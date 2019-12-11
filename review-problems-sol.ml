@@ -75,13 +75,26 @@ let rec fold_left f acc l = match l with
   | Cons(x,xs) -> fold_left f (f acc x) xs
 
 let fold_left' f e l =
-  fold_right (fun a b -> f b a) (fold_right (fun a b -> append b (Cons(a, Nil))) l Nil)
+  fold_right (fun a b -> f b a) (fold_right (fun a b -> append b (Cons(a, Nil))) l Nil) e
+
+let rec scan_left (f : 'b -> 'a -> 'b) (acc : 'b) (l : 'a list) : 'b list =
+  acc ::
+    match l with
+    | [] -> []
+    | x :: xs -> scan_left f (f acc x) xs
 
 let rev l =
   fold_left (fun acc x-> Cons(x,acc)) Nil l
 
+(* It is very challenging to implement rev' in terms of *only* fold right.
+   This is a solution that also needs to call `append`, so it takes
+   quadratic time, and is not the best solution.
+ *)
 let rev' l =
   fold_right (fun a b -> append b (Cons(a, Nil))) l Nil
+  
+let rev' l =
+  fold_right (fun x accl y -> accl (Cons(x,y))) l (fun x -> x) Nil
 
 let for_all p l =
     fold_right (fun x acc -> acc && p x) l true
@@ -110,11 +123,12 @@ let map2 f l1 l2 =
 let rec pairs l = match l with 
   | Nil -> Nil
   |Cons(x,Nil)-> Nil
+
   |Cons(x,Cons(y,xs))-> Cons((x,y),pairs Cons(y,xs))  
   
-let exp_base b x = Exp(Times(b, Ln(x)))
+let exp_base b x = Exp(Times(x, Ln(b)))
   
-let recip e = exp_base e Lit(-1.0)
+let recip e = exp_base e (Lit(-1.0))
   
 let rec pow e k = match k with
   |0-> Lit 1.0
@@ -129,7 +143,7 @@ let rec eval e = match e with
     | Ln (x) -> log (eval x)  
 
 let rec subst (x, e') e = match e with
-  |Var(y)-> if x=y then e' else Var("y")
+  |Var(y)-> if x=y then e' else Var(y)
   |Lit(y)-> Lit(y)
   | Plus (y,z) -> Plus(subst (x,e') y, subst (x,e') z)
   | Times (y,z) -> Times(subst (x,e') y, subst (x,e') z)
@@ -142,13 +156,54 @@ let rec deriv x e = match e with
     | Var(y)-> if y=x then Lit(1.0) else Lit(0.0)
     | Lit(y)-> Lit(0.0)
     | Plus (y,z) -> Plus(deriv x y, deriv x z)
-    | Times (y,z) -> Times(deriv x y, deriv x z)
+    | Times (y,z) -> Plus(Times(y, deriv x z),Times(z, deriv x y))
     | Exp (y) -> Times(Exp(y), deriv x y)
     | Ln (y) -> Times(recip y, deriv x y) 
     
-let nr x0 e = x0-.(eval_at ("x", x0) e)/.(eval_at ("x", x0) (deriv "x" e))
+ let nr x0 e = 
+  let rec f x =
+  let a = (x-.(eval_at ("x", x) e)/.(eval_at ("x", x) (deriv "x" e)))
+    in if (abs_float(a-.0.0))< (0.001) then a else f a 
+   in f x0
  
   
+
+  |Cons(x,Cons(y,xs))-> Cons((x,y),pairs Cons(y,xs))
+
+let rec pow k n =
+  if k = 0 then 1
+  else pow (k-1) n * n
+
+let rec pow_gen k =
+  if k = 0 then
+    fun _ -> 1
+  else
+    let f = pow_gen (k-1) in
+    fun x -> x * f x
+
+let poly_gen cs =
+  let rec go i = function
+    | [] -> fun _ -> 0
+    | c :: cs ->
+       let f = go (i+1) cs in
+       fun x -> c * pow i x + f x
+  in
+  go 0 cs
+
+(* The above solution is a bit wasteful in that it calculates pow 0, pow 1,
+   pow 2, and so on.  This will take quadratic time.  We can improve this
+   by carrying a function instead of a counter. *)
+
+let poly_gen' cs =
+  let rec go pow = function
+    | [] -> fun _ -> 0
+    | c :: cs ->
+       let f = go (fun x -> x * pow x) cs in
+       fun x -> c * pow x + f x
+  in
+  go (fun _ -> 1) cs
+
+
 (* Lazy Programming *)
 module Lazy = struct
   type 'a susp = Susp of (unit -> 'a)
