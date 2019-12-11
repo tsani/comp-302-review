@@ -22,7 +22,8 @@
    It's probably a good idea to at least *attempt* 3-star problems,
    even if you don't feel super comfortable with the material, because
    they will hopefully push the boundaries of your knowledge. But
-   don't feel bad if you can't solve them without hints from your
+   don't feel bad if you can't solve
+   them without hints from your
    friends.
 
    One more remark about the stars: they don't reflect overall
@@ -126,9 +127,6 @@ module Functions = struct
   let rec fold_right f l e = match l with
       Cons (x,xs) -> f x (fold_right f xs e)
     | Nil -> e
-  ;;
-
-  fold_right (fun x y -> y+.1.) (of_list [1;2;3]) 0.;;
 
   (* According to the description above, `fold_right f l e` takes a
      list
@@ -163,6 +161,7 @@ module Functions = struct
      Note: reversing the list doesn't help.
 
      Rank: ***
+
    *)
   let fold_left' (f:'a->'b->'a) (e:'a) (l:'b mylist) = (fold_right (fun x y -> (fun z -> y (f z x))) l (fun w -> w)) e
 
@@ -245,6 +244,15 @@ module Functions = struct
                          (fun w -> w)
                       ) (l2,Nil)
 
+  let map2_improved f l1 l2 = (fold_right
+                                 (fun x k -> fun z -> match z with
+                                    | Cons (y,ys) -> Cons (f x y, k ys)
+                                    | _ -> raise (Invalid_argument "List lengths don't match")
+                                 )
+                                 l1
+                                 (fun w -> w)
+                              ) l2
+
   (* It's easy to implement reverse using fold_left.
      rev : 'a mylist -> 'a mylist
      Reverses a list.
@@ -281,7 +289,7 @@ module Functions = struct
 
      Rank: **
    *)
-  let for_all p l = assert false
+  let for_all p l = fold_right (fun x y -> y && p x ) l true
   (* exists : ('a -> bool) -> 'a mylist -> bool *)
   (* `exists p l` is true
      if and only if
@@ -292,7 +300,7 @@ module Functions = struct
 
      Rank: **
    *)
-  let exists p l = assert false
+  let exists p l = fold_right (fun x y -> y || p x) l false
 
   (* By the way, in formal logic we can make the following observation:
 
@@ -311,8 +319,13 @@ module Functions = struct
 
      Rank: **
    *)
-  let for_all' p l = assert false
-  let exists' p l = assert false
+  let for_all' p l =
+    let p' x = not (p x) in
+    not (exists p' l)
+
+  let exists' p l =
+    let p' x = not (p x) in
+    not (for_all p' l)
 
   (* Prove, using induction, the following.
 
@@ -338,7 +351,7 @@ module Functions = struct
 
      Rank: *
    *)
-  let sum l = assert false
+  let sum l = fold_right (+) l 0
 
   (* Prove, using induction, the following theorem.
 
@@ -402,7 +415,9 @@ module Functions = struct
 
      Rank: *
    *)
-  let pairs l = assert false
+  let rec pairs l = match l with
+    | (x1::x2::xs) -> (x1,x2) :: (pairs (x2::xs))
+    | _ -> []
 
   (* Your previous implementation was almost certainly not tail
      recursive, so let's rewrite it tail-recursively using continuations.
@@ -411,7 +426,13 @@ module Functions = struct
 
      Rank: **
    *)
-  let pairs_k l k = assert false
+  let rec pairs_k l =
+    let rec aux l k = match l with
+      | x1::x2::xs -> aux (x2::xs) (fun s -> k ((x1,x2)::s))
+      | _ -> k []
+    in
+    aux l (fun x -> x)
+
 
   (* I know I said no more folds, but I can't help myself.
 
@@ -430,7 +451,12 @@ module Functions = struct
      scan_left f e [x1;x2;...]
      = [f e x1; f (f e x1) x2; f (f (f e x1) x2) x3; ...]
    *)
-  let scan_left f acc l = assert false
+  let rec scan_left f acc l = match l with
+    | (x::xs) ->
+      let next_acc = f acc x in
+      next_acc :: scan_left f next_acc xs
+    | [] -> []
+
 
   (* Okay, now that's enough with lists. *)
   (* Next topic: math *)
@@ -479,14 +505,13 @@ module Functions = struct
      the exponential and ln for integer powers.
      Instead, for integer powers, we can just use repeated
      multiplication.
-
      Implement the function
-     pow : exp -> k -> exp
+     pow : exp -> int -> exp
      such that
      pow e k computes e * e * e * ... * e (k times)
-
+     You can assume `k` is positive (no need to check this).
      Rank: *
-   *)
+  *)
   let pow e k = assert false
 
   (* Polynomials are an important class of functions.
