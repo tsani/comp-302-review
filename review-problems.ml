@@ -468,6 +468,15 @@ module Functions = struct
     | Exp of exp (* exponential: exp(e) *)
     | Ln of exp (* natural log: ln(e) *)
 
+  let rec print_exp e = match e with
+    | Var s -> s
+    | Lit f -> string_of_float f
+    | Plus (e1,e2) -> "("^(print_exp e1) ^ "+" ^ (print_exp e2) ^ ")"
+    | Times (e1,e2) ->  "("^(print_exp e1) ^ "*" ^ (print_exp e2) ^ ")"
+    | Exp e ->  "exp (" ^ (print_exp e) ^ ") "
+    | Ln e -> "ln (" ^ (print_exp e) ^ ") "
+
+
   (* There are some things missing in our exp datatype
      but that's because they can be expressed in terms of things we
      already have. *)
@@ -488,7 +497,7 @@ module Functions = struct
 
      Rank: *
    *)
-  let exp_base b x = assert false
+  let exp_base b x = Exp (Times (x,Ln(b)))
 
   (* Use exp_base to construct the reciprocal.
 
@@ -499,7 +508,7 @@ module Functions = struct
 
      (Recall: 1/e = e^-1)
    *)
-  let recip e = assert false
+  let recip e = exp_base e (Lit (-1.0))
 
   (* Computationally, it's inefficient to detour through
      the exponential and ln for integer powers.
@@ -512,7 +521,9 @@ module Functions = struct
      You can assume `k` is positive (no need to check this).
      Rank: *
   *)
-  let pow e k = assert false
+
+
+  let rec pow e k = if k = 0 then ( Lit 1.0) else Times (e,pow e (k-1))
 
   (* Polynomials are an important class of functions.
      We would like a convenience function for constructing polynomials
@@ -527,7 +538,12 @@ module Functions = struct
 
      Rank: **
    *)
-  let poly x cs = assert false
+  let poly x cs =
+    let rec aux cs i acc = match cs with
+      | c::xs -> aux xs (i+1) (Plus (acc, Times (Lit c,pow x i)))
+      | [] -> acc
+    in
+    aux cs 0 (Lit 0.0)
 
   (* We would like to evaluate an expression.
 
@@ -547,8 +563,17 @@ module Functions = struct
      - log : float -> float
 
      Rank: *
-   *)
-  let eval e = assert false
+  *)
+
+  exception UnboundVariable
+  let rec eval e =  match e with
+    | Var s -> raise UnboundVariable
+    | Lit f -> f
+    | Plus (e1,e2) -> (eval e1) +. (eval e2)
+    | Times (e1,e2) ->(eval e1) *. (eval e2)
+    | Exp e1 -> exp (eval e1)
+    | Ln e1 -> log (eval e1)
+
 
   (* Sadly, not all expressions are free of variables!
 
@@ -565,7 +590,13 @@ module Functions = struct
 
      Rank: *
    *)
-  let subst (x, e') e = assert false
+  let rec subst (e', x) e =  match e with (*Note that the order of the tuple has been swapped to be consistent with the notation [e'/x]*)
+    | Var s when s=x-> e'
+    | Plus (e1,e2) ->  Plus (subst (e',x) e1,subst (e',x) e2)
+    | Times (e1,e2) -> Times (subst (e',x) e1, subst (e',x) e2)
+    | Exp e1 -> Exp (subst (e',x) e1)
+    | Ln e1 -> Ln (subst (e',x) e1)
+    | x -> x
 
   (* Implement the function
      eval_at : string * float -> exp -> float
@@ -579,7 +610,9 @@ module Functions = struct
 
      Rank: zero stars
    *)
-  let eval_at = assert false
+  let eval_at (a,x) e = (*Note that the order of the tuple has been swapped to be consistent with the notation [a/x]*)
+    let e = subst (a,x) e in
+    eval e
 
   (* Differentiation is a technique from calculus allowing us to
      determine the slope the tangent line of a given curve at a given
@@ -608,7 +641,13 @@ module Functions = struct
 
      Rank: **
    *)
-  let deriv x e = assert false
+  let rec deriv x e =  match e with
+    | Var s when x = s -> Lit 1.0
+    | Plus (e1,e2) -> Plus ((deriv x e1),(deriv x e2))
+    | Times (e1,e2) -> Plus (Times(e1,deriv x e2),Times(deriv x e1,e2))
+    | Exp e1 -> Times (Exp e1, deriv x e1)
+    | Ln e1 -> Times(deriv x e1,recip e1)
+    | _ -> Lit 0.0
 
   (* The Newton-Raphson method is a technique for finding the roots of
      a given function.
@@ -646,7 +685,15 @@ module Functions = struct
 
      Rank: **
    *)
-  let nr x0 e = assert false
+  let rec nr x0 e =
+    let d_e = deriv "x" e in
+    let e' = eval_at (Lit x0,"x") e in
+    let d_e' = eval_at (Lit x0,"x") d_e in
+    let x1 = x0 -. (e'/.d_e') in
+    if abs_float(eval_at (Lit x1,"x") e ) < 0.001 then
+      x1
+    else
+      nr x1 e
 
   (* Are you tired of calculus? I'm tired of calculus.
      Let's talk about code generation / partial evaluation. *)
@@ -655,9 +702,9 @@ module Functions = struct
 
      We can calculate n^k using a simple recursive program.
    *)
-  let pow k n =
-    if k = 0 then 1
-    else pow (k-1) n * n
+  (* let rec pow k n =
+   *   if k = 0 then 1
+   *   else pow (k-1) n * n *)
 
   (* Rewrite this function so it performs partial evaluation.
 
@@ -676,26 +723,34 @@ module Functions = struct
 
      Rank: *
    *)
-  let pow_gen k = assert false
+  let pow_gen k =
+    let rec aux k cont =
+      if k = 1 then
+        cont
+      else
+        aux (k-1) (fun x -> x * (cont x))
+    in
+    aux k (fun x -> x)
+
 
   (* Back to lists!
 
-     Long ago, at the top of this file, you implemented append, for
-     the mylist type. Notice in that implementation that the second
-     list is only needed at the very end.
-     This suggests that we can use partial evaluation to construct a
-     non-recursive function that just waits for the second list.
+           Long ago, at the top of this file, you implemented append, for the
+     mylist type. Notice in that implementation that the second list is only
+     needed at the very end. This suggests that we can use partial evaluation to
+     construct a non-recursive function that just waits for the second list.
 
-     Implement the function
-     app_gen : 'a list -> 'a list -> 'a list
-     such that
-     app_gen l1 computes a non-recursive function f
-     such that
-     f l2 computes the concatenation of l1 and l2.
+           Implement the function app_gen : 'a list -> 'a list -> 'a list such
+     that app_gen l1 computes a non-recursive function f such that f l2 computes
+     the concatenation of l1 and l2.
 
-     Rank: *
-   *)
-  let app_gen l1 = assert false
+           Rank: * *)
+  let app_gen l1 =
+    let rec aux l cont = match l with
+      | x :: xs -> aux xs (fun y -> cont (x::y))
+      | [] -> cont
+    in
+    aux l1 (fun x-> x)
 
   (* In the section on math, you implemented the function
      `subst` which replaces all occurrences of a specified variable
@@ -735,7 +790,21 @@ module Functions = struct
 
      Rank: **
    *)
-  let poly_gen cs = assert false
+  let poly_gen cs = match cs with
+    | y::ys ->
+      (fun x ->
+         match
+           begin
+             List.fold_left
+               (fun y z -> match y with
+                    e,i -> (Plus (e,Times(Lit z,pow x i)),i+1)
+               )
+               (Lit y,1)
+               ys
+           end
+         with (acc,_) -> acc
+      )
+    | [] -> assert false
 
   (* Consider a type of binary tree. *)
   type 'a tree =
@@ -759,7 +828,11 @@ module Functions = struct
 
      Rank: *
    *)
-  let insert t k v = assert false
+  let rec insert t k v = match t with
+    | Node (l,(k',v'),r) when k'>k -> Node (insert l k v, (k',v'), r)
+    | Node (l,(k',v'),r) when k'<k -> Node (l,(k',v'),insert r k v)
+    | Node (l,_,r) -> Node (l,(k,v),r)
+    | Empty -> Node (Empty,(k,v),Empty)
 
   (* Is your implementation of insert tail recursive?
      Explain by giving the definition of a tail recursive function.
@@ -778,7 +851,11 @@ module Functions = struct
 
      Rank: *
    *)
-  let lookup t k = assert false
+  let rec lookup t k = match t with
+    | Node (l,(k',v'),r) when k'>k -> lookup l k
+    | Node (l,(k',v'),r) when k'<k ->lookup r k
+    | Node (_,(_,v'),_) -> Some v'
+    | Empty -> None
 
   (* Prove, using induction, the following theorem.
 
@@ -808,7 +885,18 @@ module Functions = struct
 
      Rank: **
    *)
-  let insert_gen t k = assert false
+  let insert_gen t k =
+    let rec aux t cont = match t with
+      | Node (l,(k',v'),r) when k'>k -> aux l (fun x -> cont (Node (x,(k',v'),r)))
+      | Node (l,(k',v'),r) when k'<k -> aux r (fun x -> cont (Node (l,(k',v'),x)))
+      | Node (l,_,r) -> (fun x -> Node (l,(k,x),r))
+      | Empty -> (fun x -> cont (Node (Empty,(k,x),Empty)))
+    in
+    aux t (fun x -> x)
+
+  ;;
+
+
 end
 
 module Lazy = struct
