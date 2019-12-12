@@ -701,7 +701,8 @@ module Functions = struct
   (* The canonical example: pow
 
      We can calculate n^k using a simple recursive program.
-   *)
+  *)
+
   (* let rec pow k n =
    *   if k = 0 then 1
    *   else pow (k-1) n * n *)
@@ -790,21 +791,16 @@ module Functions = struct
 
      Rank: **
    *)
-  let poly_gen cs = match cs with
-    | y::ys ->
-      (fun x ->
-         match
-           begin
-             List.fold_left
-               (fun y z -> match y with
-                    e,i -> (Plus (e,Times(Lit z,pow x i)),i+1)
-               )
-               (Lit y,1)
-               ys
-           end
-         with (acc,_) -> acc
-      )
-    | [] -> assert false
+
+  let poly_gen cs =
+    let rec aux l k = match l with
+      | y :: ys ->
+        let rest_sum = aux ys (fun x -> x * (k x)) in
+        (fun x -> y*(k x) + rest_sum x)
+      | [] -> (fun _ -> 0)
+    in
+    aux cs (fun _ -> 1)
+
 
   (* Consider a type of binary tree. *)
   type 'a tree =
