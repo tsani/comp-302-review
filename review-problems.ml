@@ -910,6 +910,11 @@ module Lazy = struct
     ; tl : 'a str susp
     }
 
+  (*Helper function to view stream*)
+
+  let rec take n s =
+    if n = 0 then [] else s.hd::take (n-1) (force s.tl)
+
   (** Implement the function
       nth : int -> 'a str -> 'a
       such that
@@ -917,7 +922,7 @@ module Lazy = struct
 
       Rank: *
    *)
-  let nth n s = assert false
+  let rec nth n s = if n = 0 then s.hd else nth (n-1) (force s.tl)
 
   (** The fibonacci sequence is defined as
       fib 0 = 0
@@ -937,8 +942,16 @@ module Lazy = struct
       HINT: There is also a more "pedestrian" way.
       Use a helper function to calculate, given fib n and fib (n+1),
       the fibonacci sequence starting from fib (n+2).
-   *)
-  let fib : int str = assert false
+  *)
+
+  let fib : int str =
+    let rec aux n1 n2 =
+      {
+        hd = n1;
+        tl = Susp (fun () -> aux (n2) (n1+n2))
+      }
+    in
+    aux 0 1
 
   (** In mathematics, a sequence is defined as a function from the
       natural numbers to some other set. That is, for each natural
@@ -953,7 +966,16 @@ module Lazy = struct
 
       Rank: *
    *)
-  let seq f = assert false
+  let seq f =
+    let rec aux n1 =
+      {
+        hd = f n1;
+        tl = Susp (fun () -> aux (n1+1))
+      }
+    in
+    aux 0
+
+
 
   (** The Wallis product, published in 1656, is an infinite product
       whose limit is pi/2. It is among the oldest known ways to
@@ -993,12 +1015,16 @@ module Lazy = struct
         with `f 0`.
 
       Rank: *
-   *)
-  (* let wallis_1 =
-   *   let rec f n =
-   *     assert false
-   *   in
-   *   assert false *)
+  *)
+
+  let wallis_1 =
+    let rec f n =
+      if n = 0 then
+        1.0
+      else
+        (4.0*.(float_of_int n)**2.0)/.((4.0*.(float_of_int n)**2.0)-.1.0) *. f (n-1)
+    in
+    force ((seq f).tl)
 
   (** This previous method is quite inefficient, since it recalculates
       the same things over and over again, through the recursive
@@ -1018,7 +1044,16 @@ module Lazy = struct
 
       Rank: **
    *)
-  let wallis_2 = assert false
+  let wallis_2 =
+    let rec aux n an=
+      let anplus1 = (4.0*.(float_of_int (n+1))**2.0)/.((4.0*.(float_of_int (n+1))**2.0)-.1.0) in
+      {
+        hd = an;
+        tl = Susp (fun x -> aux (n+1) anplus1)
+      }
+    in
+    aux 1 (4.0/.3.0)
+
 
   (** The super-Catalan numbers are a two-dimensional generalization
       of the Catalan numbers.
@@ -1039,7 +1074,9 @@ module Lazy = struct
       0! = 1
       (n+1)! = n! * (n + 1)
    *)
-  let superc m n = assert false
+  let superc m n =
+    let rec fact n = if n = 0 then 1 else n*(fact (n-1)) in
+   float_of_int ((fact (2*m))*(fact (2*n))) /. float_of_int ((fact (m+n))*(fact m)*(fact n))
 
   (** An infinite two-dimensional grid of integers can be modelled
       with the type `int str str`.
@@ -1060,5 +1097,19 @@ module Lazy = struct
 
       Rank: **
    *)
-  let supercatalan = assert false
+  let supercatalan =
+    let rec aux1d m n =
+      {
+        hd = superc m n;
+        tl = Susp (fun () -> aux1d m (n+1))
+      }
+    in
+    let rec aux2d m n =
+      {
+        hd = aux1d m n;
+        tl = Susp (fun () -> aux2d (m+1) n)
+      }
+    in
+    aux2d 0 0
+
 end
