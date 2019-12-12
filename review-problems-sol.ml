@@ -179,7 +179,7 @@ module Lazy = struct
       {hd = n;
        tl = Susp (fun () -> go (n+m) n)}
     in
-    go 1 0
+    go 0 1
 
   let rec seq f =
     let rec go n =
