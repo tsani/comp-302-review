@@ -774,7 +774,29 @@ module Functions = struct
 
      Rank: ***
    *)
-  let subst_gen x e = assert false
+  let subst_gen x e =
+    let rec aux e = match e with
+      | Var s when s=x-> (fun e' -> e')
+
+      | Plus (e1,e2) ->
+        let (f1,f2) = (aux e1,aux e2) in
+        (fun x -> Plus (f1 x,f2 x))
+
+      | Times (e1,e2) ->
+        let (f1,f2) = (aux e1,aux e2) in
+        (fun x -> Times (f1 x,f2 x))
+
+      | Exp e1 ->
+        let f1 = aux e1 in
+        (fun x -> Exp (f1 x))
+
+      | Ln e1 ->
+        let f1 = aux e1 in
+        (fun x -> Ln (f1 x))
+      | y -> (fun _ -> y)
+    in
+    aux e
+
 
   (* In this problem, we consider partially evaluated polynomials.
 
@@ -790,7 +812,7 @@ module Functions = struct
      To calculate x^k, you should use pow k x.
 
      Rank: **
-   *)
+  *)
 
   let poly_gen cs =
     let rec aux l k = match l with
@@ -823,7 +845,7 @@ module Functions = struct
      This should overwrite any previous value associated with k in the BST.
 
      Rank: *
-   *)
+  *)
   let rec insert t k v = match t with
     | Node (l,(k',v'),r) when k'>k -> Node (insert l k v, (k',v'), r)
     | Node (l,(k',v'),r) when k'<k -> Node (l,(k',v'),insert r k v)
@@ -834,7 +856,7 @@ module Functions = struct
      Explain by giving the definition of a tail recursive function.
 
      Rank: *
-   *)
+  *)
 
   (* Now we wish to implement the opposite operation.
      Implement the function
@@ -846,7 +868,7 @@ module Functions = struct
      can't find the given entry.
 
      Rank: *
-   *)
+  *)
   let rec lookup t k = match t with
     | Node (l,(k',v'),r) when k'>k -> lookup l k
     | Node (l,(k',v'),r) when k'<k ->lookup r k
@@ -867,7 +889,7 @@ module Functions = struct
      if you get stuck.
 
      Rank: ***
-   *)
+  *)
 
   (* Notice, in your implementation of insert, you did not need the
      *value* to insert until the very end.
@@ -880,7 +902,7 @@ module Functions = struct
      such that f v inserts v associated to k into the tree t.
 
      Rank: **
-   *)
+  *)
   let insert_gen t k =
     let rec aux t cont = match t with
       | Node (l,(k',v'),r) when k'>k -> aux l (fun x -> cont (Node (x,(k',v'),r)))
