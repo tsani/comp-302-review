@@ -105,6 +105,53 @@ let exists p l =
 let for_all' p l =
    not (exists (fun x -> not (p x)) l)
 
+(* THEOREM. For any p : 'a -> bool and any l : 'a list,
+   for_all p l = for_all' p l
+
+   PROOF. By induction on l.
+
+   First, since for_all' p l = not (exists (fun x -> not (p x)) l), I'll prove
+   the claim in this form.
+   Second, I'll allow myself to write (not p) as a shorthand for (fun x -> not (p x)).
+
+   Case l = [].
+    LHS = for_all p [] = true     -- by for_all
+    RHS = not (exists (not p) [])
+        = not false = true        -- by exists
+        = true                    -- by not
+
+   Case l = x :: xs.
+
+    IH: for_all p xs = not (exists (not p) xs)
+
+    LHS = for_all p (x :: xs)
+        = if p x then for_all p xs else false  -- by for_all
+
+    RHS = not (exists (not p) (x :: xs))
+        = not (if not (p x) then true else exists (not p) xs) -- by exists
+
+   Neither expression can be reduced further unless we know the value of `p x`.
+   Therefore the proof must consider two subcases.
+
+    Subcase p x = true.
+     LHS = for_all p xs                        -- by if since p x = true
+     RHS = not (if not true then true else exists (not p) xs)
+           -- by p since p x = true by assumption in this subcase
+         = not (if false then true else exists (not p) xs)  -- by not
+         = not (exists (not p) xs)                          -- by if
+
+     Notice: LHS = RHS by IH.
+
+    Subcase p x = false.
+     LHS = false   -- by if since p x = false.
+     RHS = not (if not false then true else ...)
+           -- by p since p x = false by assumption in this subcase
+         = not true -- by if
+         = false    -- by not
+
+     Notice: LHS = RHS.
+*)
+
 let exists' p l =
     not (for_all (fun x -> not (p x)) l)
 
