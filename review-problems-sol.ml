@@ -167,6 +167,13 @@ let map2 f l1 l2 =
     let tup = combine l1 l2 in
     map (fun (x,y) -> f x y) tup
     
+ let map2' f l1 l2 =
+  fold_right (fun x1 acc -> (fun l2' -> begin
+        match l2' with
+        | Nil -> Nil
+        | Cons(x2, xs) -> Cons((f x1 x2),(acc xs))
+      end)) l1 (fun _ -> Cons) l2
+    
 let rec pairs l = match l with 
   | Nil -> Nil
   |Cons(x,Nil)-> Nil
