@@ -280,5 +280,8 @@ module Lazy = struct
       }
     in
     get_supcat 0
+    
+    (* alternate implementation in terms of seq *)
+    let supercatalan = seq (fun n -> seq (fun m -> superc m n))
 
 end
