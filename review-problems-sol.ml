@@ -172,7 +172,7 @@ let map2 f l1 l2 =
         match l2' with
         | Nil -> Nil
         | Cons(x2, xs) -> Cons((f x1 x2),(acc xs))
-      end)) l1 (fun _ -> Cons) l2
+      end)) l1 (fun _ -> Nil) l2
     
 let rec pairs l = match l with 
   | Nil -> Nil
