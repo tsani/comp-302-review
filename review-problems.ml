@@ -172,7 +172,7 @@ module Functions = struct
    *)
 
   (* Implement the function
-     combine : 'a list -> 'b list -> ('a * 'b) list
+     combine : 'a mylist -> 'b mylist -> ('a * 'b) mylist
      which pairs up the elements of the input lists.
      Assume that the input lists have the same length.
 
