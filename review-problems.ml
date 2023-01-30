@@ -182,14 +182,14 @@ module Functions = struct
   let combine l1 l2 = assert false
 
   (* The OCaml List module defines
-     List.map2 : ('a -> 'b -> 'c) -> 'a mylist -> 'b mylist -> 'c mylist
+     List.map2 : ('a -> 'b -> 'c) -> 'a list -> 'b list -> 'c list
 
      Implement
-     map2 : ('a -> 'b -> 'c) -> 'a list -> 'b list -> 'c list
+     map2 : ('a -> 'b -> 'c) -> 'a mylist -> 'b mylist -> 'c mylist
      using `combine` and `map`
      such that
-     map2 f [x1;x2;...] [y1;y2;...] = [f x1 y1; f x2 y2; ...]
-
+     map2 f (Cons x1, (Cons x2, ...)) (Cons y1, (Cons y2, ...)) = (Cons f x1 y1, (Cons f x2 y2, ...))
+     
      Assume the input lists have the same length (no need to check
      this).
 
@@ -352,13 +352,13 @@ module Functions = struct
   (* Also from this point onwards, feel free to use 'a mylist or plain
      'a list. *)
 
-  (* pairs : 'a list -> ('a * 'a) list
+  (* pairs : 'a mylist -> ('a * 'a) mylist
      pairs l makes a list of all successive pairs of elements in l;
      that is, it groups the elements two-by-two.
 
      e.g.
-     pairs [x1, x2, x3, x4, x5]
-     = [(x1, x2); (x2, x3); (x3, x4); (x4; x5)]
+     pairs Cons(1, Cons(2, Cons(3, Cons(4, Cons(5, Nil)))))
+     = Cons ((1, 2), Cons ((2, 3), Cons ((3, 4), Cons ((4, 5), Nil))))
 
      Notice that there is one fewer element in the output than in the
      input.
@@ -373,7 +373,7 @@ module Functions = struct
   (* Your previous implementation was almost certainly not tail
      recursive, so let's rewrite it tail-recursively using continuations.
 
-     pairs_k : 'a list -> (('a * 'a) list -> 'r) -> 'r
+     pairs_k : 'a mylist -> (('a * 'a) mylist -> 'r) -> 'r
 
      Rank: **
    *)
