@@ -179,6 +179,13 @@ let rec pairs l = match l with
   |Cons(x,Nil)-> Nil
   |Cons(x,Cons(y,xs))-> Cons((x,y),pairs Cons(y,xs))
 
+let rec pairs_k ls return = 
+  match ls with
+  |Nil -> return Nil
+  |Cons (a, Nil) -> return Nil
+  |Cons (a,Cons(b,ls')) -> pairs_k ls' (fun x -> return (Cons((a,b),x)))
+(* Call with pair_k list (fun x -> x) *)
+
 let rec pow k n =
   if k = 0 then 1
   else pow (k-1) n * n
