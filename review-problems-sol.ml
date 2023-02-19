@@ -219,6 +219,41 @@ let poly_gen' cs =
   in
   go (fun _ -> 1) cs
 
+(* Binary search tree problems *)
+(* Definitions *)
+type 'a tree = 
+  |Empty 
+  |Node of ('a tree * 'a * 'a tree)
+ 
+type 'a bst = (int * 'a) tree (* Key-Value pair*)
+
+
+(* insert : 'a bst -> int -> 'a -> 'a bst *)
+(* Not tail-recursive *)
+let rec insert (tree:'a bst) (key: int) (value: 'a) :'a bst = 
+  match tree with
+  |Empty -> Node (Empty, (key, value), Empty)
+  |Node (l,(k,v), r) -> 
+      if k = key then (Node (l, (k, value),r)) else
+      if k > key then (Node (insert l key value, (k,v), r)) else 
+        (Node (l,(k,v),insert r key value)) 
+
+let rec lookup tree key = 
+  match tree with
+  |Empty -> None
+  |Node (l,(k,v), r) -> 
+      if k = key then Some v else
+      if k > key then lookup l key else
+        lookup r key
+
+let rec insert_gen tree key = 
+  match tree with
+  |Empty -> (fun x -> Node (Empty, (key, x), Empty))
+  |Node (l,(k,v), r) -> 
+      if k = key then (fun x -> (Node (l, (k, x),r))) else
+      if k > key then (fun x -> (Node ((insert_gen l key) x, (k,v), r))) else 
+        (fun x -> (Node (l,(k,v),(insert_gen r key) x)))
+
 (* Lazy Programming *)
 module Lazy = struct
   type 'a susp = Susp of (unit -> 'a)
