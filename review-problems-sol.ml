@@ -183,7 +183,7 @@ let rec pairs_k ls return =
   match ls with
   |Nil -> return Nil
   |Cons (a, Nil) -> return Nil
-  |Cons (a,Cons(b,ls')) -> pairs_k ls' (fun x -> return (Cons((a,b),x)))
+  |Cons (a,Cons(b,ls')) -> pairs_k Cons(b,ls') (fun x -> return (Cons((a,b),x)))
 (* Call with pair_k list (fun x -> x) *)
 
 let rec pow k n =
