@@ -250,9 +250,14 @@ let rec insert_gen tree key =
   match tree with
   |Empty -> (fun x -> Node (Empty, (key, x), Empty))
   |Node (l,(k,v), r) -> 
-      if k = key then (fun x -> (Node (l, (k, x),r))) else
-      if k > key then (fun x -> (Node ((insert_gen l key) x, (k,v), r))) else 
-        (fun x -> (Node (l,(k,v),(insert_gen r key) x)))
+      if k = key then 
+        (fun x -> Node (l, (k, x),r))
+      else if k > key then 
+        let f = insert_gen l key in 
+        (fun x -> Node(f x, (k,v), r))
+      else 
+        let f = insert_gen r key in 
+        (fun x -> Node (l,(k,v),f x))
 
 (* Lazy Programming *)
 module Lazy = struct
