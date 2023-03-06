@@ -8,6 +8,47 @@ let rec append l1 l2 = match l1 with
 | Nil -> l2
 | Cons(x,xs) -> Cons(x, (append xs l2))
 
+(*
+  Theorem (Append is associative)   
+
+  For any 'a list l1, l2 and l3,
+     append l1 (append l2 l3) = append (append l1 l2) l3
+    
+  *Proof by induction on l1
+
+  -Case l1 = Nil
+
+  WTS: append Nil (append l2 l3) = append (append Nil l2) l3
+
+  LHS: append Nil (append l2 l3)
+      = append l2 l3             -- by definition of append
+  
+
+  RHS: append (append Nil l2) l3
+      = append (l2) l3           -- by definition of append
+      = append l2 l3             -- by common sense
+      = LHS
+      
+    ◻️
+  -Case l1 = Cons (x, xs)
+
+  WTS: append (Cons (x, xs)) (append l2 l3) = append (append (Cons (x, xs)) l2) l3
+
+  I.H. append xs (append l2 l3) = append (append xs l2) l3
+
+  LHS: append (Cons (x, xs)) (append l2 l3)
+      = Cons(x, (append xs (append l2 l3)))   -- by defnintion of append
+      = Cons(x, (append (append xs l2) l3))   -- by I.H.
+
+  RHS: append (append (Cons (x, xs)) l2) l3
+      = append (Cons(x, (append xs l2)) l3    -- by definition of append
+      = Cons(x, (append (append xs l2) l3))   -- by definition of append
+      = LHS
+      
+    ◻️
+
+*)
+
 let rec map f l = match l with
 | Nil -> Nil
 | Cons(x,xs) -> let r = f x in Cons(r, (map f xs))
