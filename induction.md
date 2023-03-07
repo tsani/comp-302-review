@@ -315,3 +315,6 @@ PROOF. Exercise.
 THEOREM. (Reverse is its own inverse.) (Rank: `**`)
     For any l : 'a list, we have:
         rev (rev l) = l
+
+To prove this, you will need to justify one step using a previous theorem:
+    LEMMA. for any l1, l2 : 'a list, we have: rev (app l1 l2) = app (rev l2) (rev l1)
