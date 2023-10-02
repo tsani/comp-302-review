@@ -917,3 +917,92 @@ module Lazy = struct
    *)
   let supercatalan = assert false
 end
+
+
+(*
+QUESTION#1 :-
+
+[Topics included :- 
+  - List Manipulation
+  - Recursion
+  - Test Cases
+]
+
+In this question, you will work with lists in OCaml.
+Your task is to write a function reverse_list that takes a list of integers and 
+returns a new list containing the same elements in reverse order.
+
+Here are the properties you should consider:
+
+- Reversing a list twice should yield the original list.
+- Reversing an empty list should still result in an empty list.
+- The order of elements within the list should be preserved.
+
+First, write a set of tests for the reverse_list function in the list named reverse_list_tests. 
+Then, implement the reverse_list function.
+*)
+
+(*
+QUESTION#2 :-
+
+[Topics included :- 
+  - Pattern Matching
+  - Integer Operations
+  - Recursion
+  - Data Types
+  - Integer Operations
+]
+
+Implementing Unary Natural Number Operations (OCaml)
+In this question, you will work with unary representations of natural numbers 
+and implement various operations on them. You need to write three functions: to_unary, from_unary and add_unary, 
+which operate on the unary representation of natural numbers.
+
+  -  to_unary : int -> unary
+        Implement a function to_unary that takes an OCaml integer and converts it into its representation in unary. 
+        Your implementation must be recursive and should use an inner helper function with an additional parameter.
+
+  -  from_unary : unary -> int
+        Implement a function from_unary that converts a unary representation unary into a native OCaml integer. 
+        Your implementation must also be recursive.
+
+  - add_unary : unary -> unary -> unary
+        Implement a function add_unary to add two unary values together. Your implementation should not 
+        convert the unary values into integers, add them, and then convert them back to unary. 
+        Instead, your implementation should be based on recursive calls to add_unary.
+
+By following these instructions, ensure that your implementation adheres to the specified concepts 
+without making any non-recursive function calls.
+*)
+
+(*
+QUESTION#3 :-
+[Topics included :- 
+  - Higher Order Functions
+  - Function Types
+  - Pattern Matching
+  - Function Application
+  - Lists
+]
+
+In OCaml, higher-order functions are functions that can take other functions as arguments or return functions as results. 
+This question explores the concept of higher-order functions.
+
+Implement a higher-order function called `apply_to_list` that takes a function f and a list `lst`. 
+The function `apply_to_list` should apply the function `f` to each element of the list `lst` 
+and return a new list containing the results.
+
+Here are the specific tasks:
+
+- Define a higher-order function apply_to_list with the following type signature
+  val apply_to_list : ('a -> 'b) -> 'a list -> 'b list
+  The function `apply_to_list` should take a function `f` that maps values of type `'a to 'b`, and a list of values of type `'a`. 
+  It should return a list of values of type `'b`.
+
+- Write at least two example functions `f1` and `f2`, each with different type signatures. For instance, `f1` could be a function 
+  that squares an integer, and `f2` could be a function that converts a string to uppercase.
+
+- Apply the apply_to_list function to each of the example functions f1 and f2, and a list of values. 
+  Provide examples of the input list and the expected output for each function.
+
+*)

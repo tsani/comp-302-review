@@ -380,3 +380,107 @@ module Lazy = struct
     let supercatalan = seq (fun n -> seq (fun m -> superc m n))
 
 end
+
+
+
+(*
+ANSWER FOR QUESTION#1 :-
+
+Test Cases:
+(* TODO: Write a good set of tests for reverse_list. *)
+let reverse_list_tests = [
+  (
+    [],        (* input: an empty list *)
+    []         (* output: the reversed list is still an empty list *)
+  );
+  (
+    [1; 2; 3], (* input: a list [1; 2; 3] *)
+    [3; 2; 1]  (* output: the reversed list is [3; 2; 1] *)
+  );
+  (
+    [4; 7; 2; 8], (* input: a list [4; 7; 2; 8] *)
+    [8; 2; 7; 4]  (* output: the reversed list is [8; 2; 7; 4] *)
+  );
+  (
+    [1],     (* input: a single-element list [1] *)
+    [1]      (* output: the reversed list is still [1] *)
+  );
+  (
+    [9; 3; 6; 2; 0], (* input: a list [9; 3; 6; 2; 0] *)
+    [0; 2; 6; 3; 9]  (* output: the reversed list is [0; 2; 6; 3; 9] *)
+  )
+]
+
+
+
+(* Implementation of the reverse_list function *)
+let rec reverse_list lst =
+  match lst with
+  | [] -> []
+  | head :: tail -> reverse_list tail @ [head]
+
+
+*)
+
+
+(*
+ANSWER FOR QUESTION#2 :-
+
+(* Unary Natural Number Operations *)
+
+(* Define a recursive type 'unary' for unary representation of natural numbers *)
+type unary = Z | S of unary
+
+(* to_unary: Convert an OCaml integer into its unary representation *)
+let to_unary n =
+  let rec aux n acc =
+    if n <= 0 then acc
+    else aux (n - 1) (S acc)
+  in
+  if n < 0 then Z
+  else aux n Z
+
+(* from_unary: Convert a unary representation 'unary' to an OCaml integer *)
+let from_unary unary_val =
+  let rec aux unary_acc acc =
+    match unary_acc with
+    | Z -> acc
+    | S rest -> aux rest (acc + 1)
+  in
+  aux unary_val 0
+
+(* add_unary: Add two unary representation 'unary' values together *)
+let rec add_unary unary1 unary2 =
+  match unary1 with
+  | Z -> unary2
+  | S rest -> S (add_unary rest unary2)
+
+*)
+
+
+(*
+ANSWER FOR QUESTION#3 :-
+
+(* Define the higher-order function apply_to_list *)
+let rec apply_to_list f lst =
+  match lst with
+  | [] -> []
+  | x :: rest -> (f x) :: (apply_to_list f rest)
+
+(* Example function f1: Square an integer *)
+let f1 x = x * x
+
+(* Example function f2: Convert a string to uppercase *)
+let f2 str = String.uppercase_ascii str
+
+(* Test cases *)
+let input_list1 = [1; 2; 3; 4]
+let input_list2 = ["apple"; "banana"; "cherry"]
+
+let result1 = apply_to_list f1 input_list1
+(* Expected output: [1; 4; 9; 16] *)
+
+let result2 = apply_to_list f2 input_list2
+(* Expected output: ["APPLE"; "BANANA"; "CHERRY"] *)
+
+*)
