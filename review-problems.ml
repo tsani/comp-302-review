@@ -121,7 +121,7 @@ module Functions = struct
      list
      l = `Cons (x1, (Cons (x2, Cons (x3, Nil))))` for example
      and computes
-     `f x1 (f x2 (f x2 e))`
+     `f x1 (f x2 (f x3 e))`
      Notice that the applications of `f` are nested to the _right_.
 
      What if we wanted the opposite nesting?
