@@ -1006,3 +1006,114 @@ Here are the specific tasks:
   Provide examples of the input list and the expected output for each function.
 
 *)
+
+
+(*
+QUESTION#4 :-
+
+Imagine you have a list of students, each represented by their name, a transcript of courses and grades
+and you want to find students who have achieved high honors. 
+
+Using higher-order functions in OCaml, solve the following problems:
+
+  - Implement a function `find_honors_student` with the following signature:
+      
+      val find_honors_student : student list -> name option
+
+      This function should take a list of students and return the name of a student who has 
+      achieved a grade of over 90 in all their courses. If there is no such student, return `None`.
+
+  - Implement a function `average_grade` with the following signature:
+
+      val average_grade : student -> float
+
+      This function should take a single student and calculate their average grade across all courses. 
+      Use this function to find the student with the highest average grade in the list of students.
+
+  - Implement a function `top_students` with the following signature:
+
+      val top_students : student list -> name list
+
+      This function should take a list of students and return a list of names of students who have achieved a 
+      grade of 95 or higher in at least one course.
+
+*)
+
+(*
+QUESTION#5 :-
+
+Recursive Chessboard Exploration
+
+Consider an `n` x `n` chessboard represented as a grid of squares. Each square can be either empty or blocked. 
+You start at the top-left square `(0, 0)` and want to reach the bottom-right square `(n-1, n-1)`. 
+However, there are some restrictions:
+
+- You can only move right or down.
+- You cannot move through blocked squares.
+- You cannot visit the same square twice.
+
+(1). Implement a recursive function `explore_chessboard` with the following signature:
+
+  val explore_chessboard : int -> bool array array -> bool
+
+      This function should take an integer `n` (the size of the chessboard), a 2D boolean array representing the 
+      blocked squares (where `true` indicates a blocked square), and return `true` if there is a path from the top-left 
+      corner `(0, 0)` to the bottom-right corner `(n-1, n-1)` that adheres to the rules mentioned above. Otherwise, return `false`.
+
+(2). Create a higher-order function `process_path` with the following signature:
+
+  val process_path : (int * int -> unit) -> int -> bool array array -> unit
+
+      This function should take a function `process` that accepts coordinates `(x, y)` and a 2D boolean array representing the chessboard. 
+      It should apply the `process` function to each square in the path from `(0, 0)` to `(n-1, n-1)` while adhering to the rules, 
+      starting from the top-left corner and ending at the bottom-right corner.
+
+(3). Implement a function `print_chessboard` with the following signature:
+
+  val print_chessboard : bool array array -> unit
+
+      This function should take a 2D boolean array representing the chessboard and print it to the console, using `X` to represent 
+      blocked squares and `.` to represent empty squares.
+
+(4). Write a program that demonstrates the usage of these functions. Create a chessboard, print it, explore it using the `explore_chessboard` function
+and print the path if a valid path exists.
+
+
+*)
+
+(*
+
+QUESTION#6 :-
+
+You are presented with an encoded message consisting of characters and instructions for decryption. 
+
+Your task is to implement a decoding algorithm following the provided instructions.
+
+(1). Implement a recursive function `decode_message` with the following signature:
+
+  val decode_message : string -> string
+
+    This function should take an encoded message as a string and recursively decode it following the 
+    instructions embedded in the message. The decoding instructions are as follows:
+
+      - Whenever the message contains a number `n`, it indicates that the next `n` characters should be reversed.
+      - Any character that is not followed by a number should remain unchanged.
+
+(2). Create a higher-order function `process_instructions` with the following signature:
+
+  val process_instructions : (char -> char) list -> string -> string
+
+    This function should take a list of character transformation functions, a string, and apply each transformation function 
+    to the string in sequence, returning the final result. Use higher-order functions to process the transformations.
+
+(3). Implement a function reverse_message with the following signature:
+
+  val reverse_message : string -> string
+
+    This function should take a string and reverse it without using built-in functions for string reversal.
+
+(4). Write a program that demonstrates the usage of these functions. Provide an encoded message as input, decode it using 
+the `decode_message` function, reverse it using the `reverse_message` function, and display the final decoded and reversed message.
+
+
+*)

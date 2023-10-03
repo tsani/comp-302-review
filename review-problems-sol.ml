@@ -484,3 +484,155 @@ let result2 = apply_to_list f2 input_list2
 (* Expected output: ["APPLE"; "BANANA"; "CHERRY"] *)
 
 *)
+
+
+(*
+ANSWER FOR QUESTION#4 :-
+
+type grade = int
+type course = string
+type name = string
+type transcript = (course * grade) list
+type student = name * transcript
+
+(* Helper function to find students with grades over 90 in all courses *)
+let high_honors student =
+  let (_, transcript) = student in
+  List.for_all (fun (_, grade) -> grade > 90) transcript
+
+(* 1. Find the name of the student having achieved over 90 in all their courses *)
+let find_honors_student students =
+  let honors_students = List.filter high_honors students in
+  match honors_students with
+  | [] -> None
+  | (name, _) :: _ -> Some name
+
+(* 2. Calculate the average grade for a student *)
+let average_grade student =
+  let (_, transcript) = student in
+  let grades = List.map snd transcript in
+  let sum = List.fold_left (+.) 0.0 (List.map float_of_int grades) in
+  let num_courses = List.length grades in
+  sum /. float_of_int num_courses
+
+(* 3. Find names of students with a grade of 95 or higher in at least one course *)
+let top_students students =
+  let has_high_grade (_, transcript) =
+    List.exists (fun (_, grade) -> grade >= 95) transcript
+  in
+  let top_student_names = List.filter has_high_grade students |> List.map fst in
+  top_student_names
+
+
+*)
+
+
+(*
+
+ANSWER FOR QUESTION#5:- 
+
+(* 1. Explore the chessboard using recursion *)
+let rec explore_chessboard n board =
+  let rec can_reach x y =
+    if x = n - 1 && y = n - 1 then true (* Reached the destination *)
+    else if x >= n || y >= n || board.(x).(y) then false (* Out of bounds or blocked *)
+    else (
+      board.(x).(y) <- true; (* Mark square as visited *)
+      can_reach (x + 1) y || can_reach x (y + 1) (* Try moving right or down *)
+    )
+  in
+  can_reach 0 0
+
+(* 2. Process the path on the chessboard *)
+let process_path process n board =
+  let rec process_square x y =
+    if x >= n || y >= n || board.(x).(y) then () (* Out of bounds or blocked *)
+    else (
+      process (x, y); (* Process the square *)
+      process_square (x + 1) y; (* Move right *)
+      process_square x (y + 1)  (* Move down *)
+    )
+  in
+  process_square 0 0
+
+(* 3. Print the chessboard to the console *)
+let print_chessboard board =
+  let n = Array.length board in
+  for i = 0 to n - 1 do
+    for j = 0 to n - 1 do
+      if board.(i).(j) then
+        Printf.printf "X "
+      else
+        Printf.printf ". "
+    done;
+    Printf.printf "\n"
+  done
+
+(* Example usage *)
+let n = 5
+let blocked_squares = [|(1, 1); (2, 2); (3, 3)|] in
+let chessboard = Array.make_matrix n n false in
+Array.iter (fun (x, y) -> chessboard.(x).(y) <- true) blocked_squares;
+
+print_chessboard chessboard;
+Printf.printf "\n";
+
+let path_exists = explore_chessboard n chessboard in
+if path_exists then (
+  Printf.printf "Path from (0, 0) to (%d, %d) exists:\n" (n - 1) (n - 1);
+  process_path (fun (x, y) -> Printf.printf "(%d, %d) " x y) n chessboard;
+  Printf.printf "\n"
+) else (
+  Printf.printf "No path from (0, 0) to (%d, %d) exists.\n" (n - 1) (n - 1)
+)
+
+
+*)
+
+
+
+(*
+ANSWER FOR QUESTION#6 :-
+
+(* 1. Decode an encoded message following recursion *)
+let rec decode_message encoded =
+  let rec decode_next n chars decoded =
+    match chars with
+    | [] -> decoded
+    | char :: rest ->
+        if Char.is_digit char then
+          decode_next (n * 10 + Char.code char - Char.code '0') rest decoded
+        else
+          if n > 0 then
+            decode_next (n - 1) rest (char :: decoded)
+          else
+            decode_next 0 rest (char :: decoded)
+  in
+  String.of_seq (Seq.of_list (List.rev (decode_next 0 (String.to_seq encoded) [])))
+
+(* 2. Process a list of character transformations using higher-order functions *)
+let process_instructions transformations input =
+  let apply_transformation str transformation =
+    String.map transformation str
+  in
+  List.fold_left apply_transformation input transformations
+
+(* 3. Reverse a string without built-in functions *)
+let reverse_message message =
+  let length = String.length message in
+  let rec reverse_chars i reversed =
+    if i < 0 then reversed
+    else reverse_chars (i - 1) (message.[i] :: reversed)
+  in
+  String.of_seq (Seq.of_list (reverse_chars (length - 1) []))
+
+(* Example usage *)
+let encoded_message = "3abcde2fg1h"
+let decoded_message = decode_message encoded_message
+(* Expected output: "edcbafgh" *)
+
+let reversed_message = reverse_message decoded_message
+(* Expected output: "hgfa bcde" *)
+
+
+*)
