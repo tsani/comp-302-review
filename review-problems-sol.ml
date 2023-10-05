@@ -207,6 +207,15 @@ let rec combine l1 l2 = match l1, l2 with
 let map2 f l1 l2 =
     let tup = combine l1 l2 in
     map (fun (x,y) -> f x y) tup
+
+let map2 f l1 l2 =
+  let partial lst1 = match lst1 with
+  | Nil -> Nil
+  | xs -> map (fun x -> f x) xs (* use map to partially apply f to each item of l1 *)
+  in let rec final combinedlst = match combinedlst with
+  | Nil -> Nil
+  | Cons ((prtl, x), pxs) -> Cons (prtl x, final pxs) (* now finish applying the partially applied f with each item (x) of l2 *)
+  in final (combine (partial l1) (l2))
     
  let map2' f l1 l2 =
   fold_right (fun x1 acc -> (fun l2' -> begin
