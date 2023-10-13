@@ -133,7 +133,7 @@ let rev l =
  *)
 let rev' l =
   fold_right (fun a b -> append b (Cons(a, Nil))) l Nil
-  
+
 let rev' l =
   fold_right (fun x accl y -> accl (Cons(x,y))) l (fun x -> x) Nil
 
