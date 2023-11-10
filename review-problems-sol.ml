@@ -375,8 +375,33 @@ module Lazy = struct
       }
     in
     get_supcat 0
-    
+
     (* alternate implementation in terms of seq *)
     let supercatalan = seq (fun n -> seq (fun m -> superc m n))
 
+    (** Let's consider lazy lists, which are possibly finite, possibly infinite. *)
+    type 'a llist = LNil | LCons of 'a * 'a llist susp
+
+    (* You can redefine many operations on streams equivalently for lazy lists, such as
+       the higher-order functions map, iterate, unfold, etc. *)
+
+    (* One quite challenging problem is to lazily perform an in-order traversal of a
+       binary tree. In other words, we want to convert the tree into a lazy list.
+       Here is the type of binary trees. *)
+    type 'a tree = Empty | Node of 'a tree * 'a * 'a tree
+
+    (* Your task is to implement the following function.
+       Rank: ***
+
+       HINT: define an inner helper `go : 'a tree -> (unit -> 'a llist) -> 'a llist`.
+       You can use the parameter of type `unit -> 'a llist` as something kind of like a continuation,
+       to capture "the rest of the traversal". *)
+    let lazy_traverse (t : 'a tree) : 'a llist =
+        let rec go (t : 'a tree) (k : unit -> 'a llist) : 'a llist =
+            match t with
+            | Empty -> k ()
+            | Node (l, x, r) ->
+                go l (fun () -> Cons (x, Susp (fun () -> go r k)))
+        in
+        go t (fun () -> LNil)
 end
