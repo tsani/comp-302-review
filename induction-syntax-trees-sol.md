@@ -57,6 +57,7 @@ the results of the recursive calls.
 **Case** `e = Var x` is similar.
 
 **Case** `e = Add (e1, e2)`
+
     WTS: eval env (Add (e1, e2)) = eval env (simplify1 (Add (e1, e2)))
     IH1: eval env e1 = eval env (simplify1 e1)
     IH2: eval env e2 = eval env (simplify1 e2)
@@ -193,6 +194,7 @@ generalization to find.
 **Proof.** By induction on `e`.
 
 **Case** `e = Var x`
+
     WTS: `sum env (flatten (Var x) acc) = eval env (Var x) + sum env acc`
 
     LHS = sum env (flatten (Var x) acc)
@@ -206,6 +208,7 @@ generalization to find.
 **Case** `e = Lit n` is similar.
 
 **Case** `e = Add (e1, e2)`
+
     WTS: `sum env (flatten (Add (e1, e2)) acc) = eval env (Add (e1, e2)) + sum env acc`
     IH1: `sum env (flatten e1             acc) = eval env e1             + sum env acc` for all acc
     IH2: `sum env (flatten e2             acc) = eval env e2             + sum env acc` for all acc
@@ -276,6 +279,7 @@ Again, this theorem cannot be proven directly and requires generalization.
 **Case** `e = Var x` follows the same idea, using the same lemma.
 
 **Case** `e = Add (e1, e2)`
+
     WTS: `sum_flat env (flatten (Add (e1, e2)) acc) = eval env (Add (e1, e2)) + sum_flat env acc`
     IH1: `sum_flat env (flatten e1 acc) = eval env e1 + sum_flat env acc` for any acc
     IH2: `sum_flat env (flatten e2 acc) = eval env e2 + sum_flat env acc` for any acc
