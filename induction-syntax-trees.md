@@ -81,6 +81,8 @@ let rec subst (env : env) : exp -> exp = function
 **Theorem.** Substitution followed by simplification performs evaluation:
     `simplify1 (subst env e) = Lit (eval env e)`
 
+This one is tricky. The way the IHs end up used here is unlike anything we've seen before.
+
 ## Flattenings
 
 The tree structure of the syntax tree above doesn't really give us anything due to the
@@ -149,4 +151,5 @@ Finally, we want to show that summing this flat representation is the same as ev
 
 **Theorem.** `sum_flat env (flatten e empty) = eval env e`
 
-Again, this theorem cannot be proven directly and requires generalization.
+Again, this theorem cannot be proven directly and requires generalization. The idea of the
+generalization is the same as in the previous theorem.
