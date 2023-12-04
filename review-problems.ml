@@ -937,3 +937,203 @@ module Lazy = struct
   let lazy_traverse (t : 'a tree) : 'a llist =
       assert false
 end
+
+
+(*
+QUESTION#1 :-
+
+[Topics included :- 
+  - List Manipulation
+  - Recursion
+  - Test Cases
+]
+
+In this question, you will work with lists in OCaml.
+Your task is to write a function reverse_list that takes a list of integers and 
+returns a new list containing the same elements in reverse order.
+
+Here are the properties you should consider:
+
+- Reversing a list twice should yield the original list.
+- Reversing an empty list should still result in an empty list.
+- The order of elements within the list should be preserved.
+
+First, write a set of tests for the reverse_list function in the list named reverse_list_tests. 
+Then, implement the reverse_list function.
+*)
+
+(*
+QUESTION#2 :-
+
+[Topics included :- 
+  - Pattern Matching
+  - Integer Operations
+  - Recursion
+  - Data Types
+  - Integer Operations
+]
+
+Implementing Unary Natural Number Operations (OCaml)
+In this question, you will work with unary representations of natural numbers 
+and implement various operations on them. You need to write three functions: to_unary, from_unary and add_unary, 
+which operate on the unary representation of natural numbers.
+
+  -  to_unary : int -> unary
+        Implement a function to_unary that takes an OCaml integer and converts it into its representation in unary. 
+        Your implementation must be recursive and should use an inner helper function with an additional parameter.
+
+  -  from_unary : unary -> int
+        Implement a function from_unary that converts a unary representation unary into a native OCaml integer. 
+        Your implementation must also be recursive.
+
+  - add_unary : unary -> unary -> unary
+        Implement a function add_unary to add two unary values together. Your implementation should not 
+        convert the unary values into integers, add them, and then convert them back to unary. 
+        Instead, your implementation should be based on recursive calls to add_unary.
+
+By following these instructions, ensure that your implementation adheres to the specified concepts 
+without making any non-recursive function calls.
+*)
+
+(*
+QUESTION#3 :-
+[Topics included :- 
+  - Higher Order Functions
+  - Function Types
+  - Pattern Matching
+  - Function Application
+  - Lists
+]
+
+In OCaml, higher-order functions are functions that can take other functions as arguments or return functions as results. 
+This question explores the concept of higher-order functions.
+
+Implement a higher-order function called `apply_to_list` that takes a function f and a list `lst`. 
+The function `apply_to_list` should apply the function `f` to each element of the list `lst` 
+and return a new list containing the results.
+
+Here are the specific tasks:
+
+- Define a higher-order function apply_to_list with the following type signature
+  val apply_to_list : ('a -> 'b) -> 'a list -> 'b list
+  The function `apply_to_list` should take a function `f` that maps values of type `'a to 'b`, and a list of values of type `'a`. 
+  It should return a list of values of type `'b`.
+
+- Write at least two example functions `f1` and `f2`, each with different type signatures. For instance, `f1` could be a function 
+  that squares an integer, and `f2` could be a function that converts a string to uppercase.
+
+- Apply the apply_to_list function to each of the example functions f1 and f2, and a list of values. 
+  Provide examples of the input list and the expected output for each function.
+
+*)
+
+
+(*
+QUESTION#4 :-
+
+Imagine you have a list of students, each represented by their name, a transcript of courses and grades
+and you want to find students who have achieved high honors. 
+
+Using higher-order functions in OCaml, solve the following problems:
+
+  - Implement a function `find_honors_student` with the following signature:
+      
+      val find_honors_student : student list -> name option
+
+      This function should take a list of students and return the name of a student who has 
+      achieved a grade of over 90 in all their courses. If there is no such student, return `None`.
+
+  - Implement a function `average_grade` with the following signature:
+
+      val average_grade : student -> float
+
+      This function should take a single student and calculate their average grade across all courses. 
+      Use this function to find the student with the highest average grade in the list of students.
+
+  - Implement a function `top_students` with the following signature:
+
+      val top_students : student list -> name list
+
+      This function should take a list of students and return a list of names of students who have achieved a 
+      grade of 95 or higher in at least one course.
+
+*)
+
+(*
+QUESTION#5 :-
+
+Recursive Chessboard Exploration
+
+Consider an `n` x `n` chessboard represented as a grid of squares. Each square can be either empty or blocked. 
+You start at the top-left square `(0, 0)` and want to reach the bottom-right square `(n-1, n-1)`. 
+However, there are some restrictions:
+
+- You can only move right or down.
+- You cannot move through blocked squares.
+- You cannot visit the same square twice.
+
+(1). Implement a recursive function `explore_chessboard` with the following signature:
+
+  val explore_chessboard : int -> bool array array -> bool
+
+      This function should take an integer `n` (the size of the chessboard), a 2D boolean array representing the 
+      blocked squares (where `true` indicates a blocked square), and return `true` if there is a path from the top-left 
+      corner `(0, 0)` to the bottom-right corner `(n-1, n-1)` that adheres to the rules mentioned above. Otherwise, return `false`.
+
+(2). Create a higher-order function `process_path` with the following signature:
+
+  val process_path : (int * int -> unit) -> int -> bool array array -> unit
+
+      This function should take a function `process` that accepts coordinates `(x, y)` and a 2D boolean array representing the chessboard. 
+      It should apply the `process` function to each square in the path from `(0, 0)` to `(n-1, n-1)` while adhering to the rules, 
+      starting from the top-left corner and ending at the bottom-right corner.
+
+(3). Implement a function `print_chessboard` with the following signature:
+
+  val print_chessboard : bool array array -> unit
+
+      This function should take a 2D boolean array representing the chessboard and print it to the console, using `X` to represent 
+      blocked squares and `.` to represent empty squares.
+
+(4). Write a program that demonstrates the usage of these functions. Create a chessboard, print it, explore it using the `explore_chessboard` function
+and print the path if a valid path exists.
+
+
+*)
+
+(*
+
+QUESTION#6 :-
+
+You are presented with an encoded message consisting of characters and instructions for decryption. 
+
+Your task is to implement a decoding algorithm following the provided instructions.
+
+(1). Implement a recursive function `decode_message` with the following signature:
+
+  val decode_message : string -> string
+
+    This function should take an encoded message as a string and recursively decode it following the 
+    instructions embedded in the message. The decoding instructions are as follows:
+
+      - Whenever the message contains a number `n`, it indicates that the next `n` characters should be reversed.
+      - Any character that is not followed by a number should remain unchanged.
+
+(2). Create a higher-order function `process_instructions` with the following signature:
+
+  val process_instructions : (char -> char) list -> string -> string
+
+    This function should take a list of character transformation functions, a string, and apply each transformation function 
+    to the string in sequence, returning the final result. Use higher-order functions to process the transformations.
+
+(3). Implement a function reverse_message with the following signature:
+
+  val reverse_message : string -> string
+
+    This function should take a string and reverse it without using built-in functions for string reversal.
+
+(4). Write a program that demonstrates the usage of these functions. Provide an encoded message as input, decode it using 
+the `decode_message` function, reverse it using the `reverse_message` function, and display the final decoded and reversed message.
+
+
+*)
